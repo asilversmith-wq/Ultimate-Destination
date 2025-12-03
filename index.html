@@ -19,56 +19,127 @@ import {
   Sparkles,
   Tag,
   Clock,
-  Plus
+  Plus,
+  Trophy,
+  Info,
+  ExternalLink
 } from 'lucide-react';
 
-// --- Mock Data & AI Simulation Helpers ---
+// --- Mock Data: Specific City Databases ---
 
-const ACTIVITY_DATABASE = {
+const CITY_DATA = {
+  paris: {
+    Adventure: [
+      { title: "Catacombs Exploration", location: "1 Av. du Colonel Henri Rol-Tanguy", cost: "$35", description: "Descend into the underground ossuaries holding the remains of over six million people." },
+      { title: "Seine River Night Cruise", location: "Port de la Bourdonnais", cost: "$20", description: "See the City of Lights sparkle from the water on a Bateaux Parisiens boat tour." }
+    ],
+    Relaxing: [
+      { title: "Picnic at Luxembourg Gardens", location: "Jardin du Luxembourg", cost: "Free", description: "Relax on the iconic green chairs by the central fountain in this 17th-century park." },
+      { title: "Spa Day at The Ritz", location: "Place Vendôme", cost: "$250", description: "Indulge in a world-class luxury spa treatment in the heart of Paris." }
+    ],
+    Cultural: [
+      { title: "Louvre Museum Private Tour", location: "Rue de Rivoli", cost: "$90", description: "Skip the line and see the Mona Lisa and Venus de Milo with an expert art historian." },
+      { title: "Eiffel Tower Summit Access", location: "Champ de Mars", cost: "$45", description: "Ride the glass elevator to the very top for panoramic views of the entire city." }
+    ],
+    Foodie: [
+      { title: "Macaron Baking Class", location: "Le Marais", cost: "$110", description: "Learn the secrets of making the perfect French macaron with a professional pastry chef." },
+      { title: "Dinner at Le Jules Verne", location: "Eiffel Tower 2nd Floor", cost: "$300", description: "Fine dining experience with arguably the best view in the world." }
+    ],
+    Family: [
+      { title: "Disneyland Paris Day Trip", location: "Marne-la-Vallée", cost: "$130", description: "Meet Mickey and explore the magical lands just a train ride away from the city center." },
+      { title: "Jardin d'Acclimatation", location: "Bois de Boulogne", cost: "$35", description: "A historic amusement park with puppet shows, roller coasters, and a petting zoo." }
+    ],
+    Sports: [
+      { title: "PSG Stadium Tour", location: "Parc des Princes", cost: "$30", description: "Go behind the scenes of Paris Saint-Germain's legendary home stadium." },
+      { title: "Tennis at Roland-Garros", location: "Avenue Gordon Bennett", cost: "$50", description: "Visit the clay courts famous for the French Open." }
+    ]
+  },
+  tokyo: {
+    Adventure: [
+      { title: "Go-Karting in Akihabara", location: "Akihabara District", cost: "$80", description: "Drive through the streets of Tokyo dressed as your favorite video game character." },
+      { title: "TeamLab Planets", location: "Toyosu", cost: "$35", description: "Walk through water and interact with digital art in this immersive museum experience." }
+    ],
+    Relaxing: [
+      { title: "Onsen Soak at Oedo Onsen", location: "Odaiba", cost: "$40", description: "Experience a traditional Japanese hot spring theme park with Edo-period atmosphere." },
+      { title: "Ueno Park Cherry Blossoms", location: "Ueno", cost: "Free", description: "Stroll beneath thousands of cherry trees (seasonal) or enjoy the serene pond views." }
+    ],
+    Cultural: [
+      { title: "Senso-ji Temple Visit", location: "Asakusa", cost: "Free", description: "Tokyo's oldest temple, famed for its giant red lantern and Nakamise shopping street." },
+      { title: "Meiji Jingu Shrine", location: "Shibuya", cost: "Free", description: "A tranquil Shinto shrine located in a lush forest in the middle of the city." }
+    ],
+    Foodie: [
+      { title: "Tsukiji Outer Market Tour", location: "Tsukiji", cost: "$60", description: "Sample fresh sushi, tamagoyaki, and seafood delicacies in this historic market." },
+      { title: "Ramen Street Tasting", location: "Tokyo Station", cost: "$25", description: "Try different regional styles of ramen in the famous underground food street." }
+    ],
+    Family: [
+      { title: "Ghibli Museum", location: "Mitaka", cost: "$15", description: "Whimsical museum showcasing the work of the legendary Studio Ghibli animation studio." },
+      { title: "Tokyo DisneySea", location: "Urayasu", cost: "$95", description: "A nautical-themed park unique to Japan, known for its incredible atmosphere." }
+    ],
+    Sports: [
+      { title: "Sumo Wrestling Practice", location: "Ryogoku", cost: "$40", description: "Watch morning practice at a sumo stable to see the wrestlers' intense training." },
+      { title: "Baseball at Tokyo Dome", location: "Bunkyo", cost: "$55", description: "Cheer for the Yomiuri Giants in Japan's most famous indoor stadium." }
+    ]
+  },
+  "new york": {
+    Adventure: [
+      { title: "Helicopter Tour of Manhattan", location: "Downtown Heliport", cost: "$220", description: "See the Statue of Liberty and Empire State Building from the sky." },
+      { title: "Top of the Rock Observation", location: "Rockefeller Center", cost: "$45", description: "Enjoy 360-degree unobstructed views of Central Park and the skyline." }
+    ],
+    Relaxing: [
+      { title: "Central Park Boat Rental", location: "Loeb Boathouse", cost: "$25", description: "Row a boat on The Lake for a peaceful escape in the middle of the city." },
+      { title: "High Line Walk", location: "Chelsea / Meatpacking", cost: "Free", description: "Walk along the elevated historic rail line converted into a public park." }
+    ],
+    Cultural: [
+      { title: "Broadway Show", location: "Theater District", cost: "$150", description: "Experience the magic of a world-class musical or play on Broadway." },
+      { title: "The MET Museum", location: "5th Avenue", cost: "$30", description: "Explore 5,000 years of art from around the globe in one of the world's largest museums." }
+    ],
+    Foodie: [
+      { title: "Pizza Walking Tour", location: "Greenwich Village", cost: "$65", description: "Sample slices from 3 distinct pizzerias and learn the history of NY pie." },
+      { title: "Chelsea Market Food Crawl", location: "Chelsea", cost: "$40", description: "Taste tacos, artisan doughnuts, and spices in this bustling indoor market." }
+    ],
+    Family: [
+      { title: "American Museum of Natural History", location: "Upper West Side", cost: "$28", description: "See the giant T-Rex skeleton and the massive blue whale model." },
+      { title: "Bronx Zoo", location: "The Bronx", cost: "$35", description: "Visit one of the largest metropolitan zoos in the world." }
+    ],
+    Sports: [
+      { title: "Yankees Game", location: "Yankee Stadium", cost: "$60", description: "Catch a baseball game in the Bronx at the home of the 27-time champions." },
+      { title: "Knicks Game at MSG", location: "Madison Square Garden", cost: "$120", description: "Experience the electric atmosphere of basketball at 'The World's Most Famous Arena'." }
+    ]
+  }
+};
+
+// --- Mock Data: Generic Database with Placeholders ---
+// Used when the city is not in the specific list above.
+const GENERIC_DATABASE = {
   Adventure: [
-    "Zip-lining through the canopy",
-    "White-water rafting expedition",
-    "Sunrise mountain hike",
-    "Off-road 4x4 safari tour",
-    "Scuba diving intro course",
-    "Rock climbing for beginners",
-    "Jet ski coastal tour"
+    { title: "Zip-lining at {City} Eco Park", location: "{City} Outskirts", cost: "$85", description: "Soar above the landscape on a thrilling zip-line circuit." },
+    { title: "{City} River Rafting", location: "River Adventure Center", cost: "$110", description: "Navigate the local rapids with an expert guide." },
+    { title: "Sunrise Hike to {City} Peak", location: "Mountain Trailhead", cost: "Free", description: "A self-guided trek to a scenic viewpoint overlooking {City}." },
   ],
   Relaxing: [
-    "Private beach yoga session",
-    "Full-day luxury spa pass",
-    "Sunset catamaran cruise",
-    "Botanical garden meditation walk",
-    "Book reading by the pool",
-    "Hot springs soak",
-    "Hammock lounging with cocktails"
+    { title: "Yoga at {City} Park", location: "Central Gardens", cost: "$20", description: "Restore your balance with a yoga class in the heart of {City}." },
+    { title: "Luxury Spa Day", location: "{City} Grand Hotel", cost: "$200", description: "Access to thermal pools and a signature massage treatment." },
+    { title: "Sunset Cruise", location: "{City} Marina", cost: "$75", description: "Sail into the sunset with complimentary drinks and views of the skyline." },
   ],
   Cultural: [
-    "Guided historical city tour",
-    "Local cooking masterclass",
-    "Museum of Ancient History visit",
-    "Traditional dance performance",
-    "Art gallery hop",
-    "Visit to iconic landmarks",
-    "Local language workshop"
+    { title: "Guided Tour of Old {City}", location: "Historic District", cost: "$25", description: "Walk through history with a local historian explaining {City}'s legends." },
+    { title: "Museum of {City} History", location: "National Museum", cost: "$18", description: "Entry ticket to galleries featuring local artifacts and art." },
+    { title: "Traditional Performance", location: "{City} Theater", cost: "$45", description: "Evening show featuring local music and traditional dance." },
   ],
   Foodie: [
-    "Street food market crawl",
-    "Michelin-star tasting menu",
-    "Vineyard tour and wine tasting",
-    "Farm-to-table lunch experience",
-    "Hidden cafe discovery tour",
-    "Chocolate making workshop",
-    "Seafood feast by the harbor"
+    { title: "{City} Street Food Tour", location: "Main Market", cost: "$35", description: "Guided tasting tour of the best street stalls in {City}." },
+    { title: "Fine Dining Tasting Menu", location: "Top Rated Bistro", cost: "$250", description: "A gastronomic journey featuring seasonal local ingredients." },
+    { title: "Cooking Class", location: "Culinary School", cost: "$80", description: "Learn to prepare authentic dishes from the {City} region." },
   ],
   Family: [
-    "Interactive science museum",
-    "Theme park day pass",
-    "Family-friendly wildlife sanctuary",
-    "Beach sandcastle competition",
-    "Ice cream tasting tour",
-    "Kids adventure playground",
-    "Aquarium visit"
+    { title: "{City} Science Center", location: "Discovery Zone", cost: "$25", description: "Hands-on exhibits perfect for curious minds of all ages." },
+    { title: "Theme Park Day Pass", location: "Adventure World", cost: "$85", description: "All-access pass to rides and attractions near {City}." },
+    { title: "{City} Zoo", location: "Zoological Park", cost: "$30", description: "Walk-through enclosures with rescued animals and educational talks." },
+  ],
+  Sports: [
+    { title: "{City} Stadium Tour", location: "Main Arena", cost: "$35", description: "Behind-the-scenes access to the home of the local champions." },
+    { title: "Golf at {City} Links", location: "Country Club", cost: "$145", description: "Green fees and cart rental for a round on the premier local course." },
+    { title: "Local Match Tickets", location: "City Stadium", cost: "$50", description: "Experience the electric atmosphere of a live home game in {City}." },
   ]
 };
 
@@ -82,8 +153,12 @@ const DEALS_DATABASE = [
 const generateItinerary = (formData) => {
   const days = parseInt(formData.duration) || 3;
   const itinerary = [];
-  
+  const cityKey = formData.destination.toLowerCase().trim();
   const interests = Object.keys(formData.interests).filter(k => formData.interests[k]);
+  
+  // Use specific data if available, otherwise use generic data
+  const isCitySpecific = CITY_DATA[cityKey];
+  const sourceData = isCitySpecific ? CITY_DATA[cityKey] : GENERIC_DATABASE;
   
   // Add custom interest if present
   if (formData.customInterest && formData.customInterest.trim() !== '') {
@@ -97,28 +172,35 @@ const generateItinerary = (formData) => {
     const dayActivities = [];
     
     // Morning Activity
-    const morningType = interests[(i - 1) % interests.length]; // Use i-1 to start at 0
-    dayActivities.push(generateActivity(morningType, '09:00 AM'));
+    const morningType = interests[(i - 1) % interests.length]; 
+    dayActivities.push(generateActivity(sourceData, morningType, '09:00 AM', formData.destination));
 
     // Lunch
     dayActivities.push({
       time: '01:00 PM',
-      title: 'Local Lunch Spot',
+      title: `Lunch at ${formData.destination} Local Spot`,
+      location: 'City Center',
+      cost: '$20-$40',
       type: 'Foodie',
-      icon: <Utensils className="w-4 h-4" />
+      icon: <Utensils className="w-4 h-4" />,
+      description: `A casual dining experience at a highly-rated eatery in ${formData.destination}.`,
+      url: `https://www.google.com/search?q=${encodeURIComponent('Best local lunch spots in ' + formData.destination)}`
     });
 
     // Afternoon Activity
-    // Use modulo logic to cycle through interests
     const afternoonType = interests[i % interests.length];
-    dayActivities.push(generateActivity(afternoonType, '03:00 PM'));
+    dayActivities.push(generateActivity(sourceData, afternoonType, '03:00 PM', formData.destination));
 
     // Dinner/Evening
     dayActivities.push({
       time: '07:30 PM',
       title: 'Evening Entertainment & Dinner',
+      location: 'Downtown District',
+      cost: '$50+',
       type: 'Relaxing',
-      icon: <Moon className="w-4 h-4" />
+      icon: <Moon className="w-4 h-4" />,
+      description: `Enjoy the vibrant nightlife of ${formData.destination} with a reservation at a top restaurant.`,
+      url: `https://www.google.com/search?q=${encodeURIComponent('Dinner and entertainment in ' + formData.destination)}`
     });
 
     itinerary.push({ day: i, activities: dayActivities });
@@ -126,15 +208,20 @@ const generateItinerary = (formData) => {
   return itinerary;
 };
 
-// Helper to handle both database and custom activities
-const generateActivity = (type, time) => {
-  let title;
+// Helper to handle database selection and formatting
+const generateActivity = (database, type, time, destinationName) => {
+  let title, location, cost, description;
   
-  // Check if it's a known category
-  if (ACTIVITY_DATABASE[type]) {
-    title = ACTIVITY_DATABASE[type][Math.floor(Math.random() * ACTIVITY_DATABASE[type].length)];
+  // Check if it's a known category in the provided database
+  if (database[type]) {
+    const activity = database[type][Math.floor(Math.random() * database[type].length)];
+    // If using generic database, replace {City} placeholder with actual destination name
+    title = activity.title.replace(/{City}/g, destinationName);
+    location = activity.location.replace(/{City}/g, destinationName);
+    cost = activity.cost;
+    description = activity.description.replace(/{City}/g, destinationName);
   } else {
-    // Generate a title for custom interest
+    // Generate data for custom interest (fallback for non-database types)
     const templates = [
       `Exclusive ${type} Experience`,
       `Private ${type} Workshop`,
@@ -142,14 +229,32 @@ const generateActivity = (type, time) => {
       `Local ${type} Discovery`,
       `Best of ${type} Visit`
     ];
-    title = templates[Math.floor(Math.random() * templates.length)];
+    title = templates[Math.floor(Math.random() * templates.length)] + ` in ${destinationName}`;
+    
+    const locationTemplates = [
+      `Downtown ${type} Center`, 
+      `${type} District`, 
+      "City Hall Plaza", 
+      "The Old Town Quarter",
+      "Convention Center"
+    ];
+    location = locationTemplates[Math.floor(Math.random() * locationTemplates.length)];
+    cost = "$" + (Math.floor(Math.random() * 60) + 20);
+    description = `A unique ${type} activity tailored to your preferences, exploring the best spots in ${destinationName}.`;
   }
+
+  // Generate a realistic search URL
+  const url = `https://www.google.com/search?q=${encodeURIComponent(title + " " + location + " " + destinationName)}`;
 
   return {
     time: time,
     title: title,
-    type: type, // This will display the custom string (e.g., "Bird Watching")
-    icon: getIconForType(type)
+    location: location,
+    cost: cost,
+    description: description,
+    type: type,
+    icon: getIconForType(type),
+    url: url
   };
 };
 
@@ -160,7 +265,8 @@ const getIconForType = (type) => {
     case 'Cultural': return <Star className="w-4 h-4" />;
     case 'Foodie': return <Utensils className="w-4 h-4" />;
     case 'Family': return <Users className="w-4 h-4" />;
-    default: return <Sparkles className="w-4 h-4 text-purple-500" />; // Custom icon
+    case 'Sports': return <Trophy className="w-4 h-4" />;
+    default: return <Sparkles className="w-4 h-4 text-purple-500" />; 
   }
 };
 
@@ -177,9 +283,9 @@ const Header = ({ onReset }) => (
           <span className="font-bold text-xl tracking-tight text-gray-900">Ultimate<span className="text-blue-600">Dest</span></span>
         </div>
         <nav className="hidden md:flex space-x-8">
+          <button onClick={onReset} className="text-gray-500 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">Home</button>
           <a href="#" className="text-gray-500 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">Destinations</a>
           <a href="#" className="text-gray-500 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">Deals</a>
-          <a href="#" className="text-gray-500 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">About AI</a>
           <button className="bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-blue-700 transition-colors">
             Sign In
           </button>
@@ -288,7 +394,8 @@ const PlannerForm = ({ onSubmit, id }) => {
       Relaxing: false,
       Cultural: false,
       Foodie: false,
-      Family: false
+      Family: false,
+      Sports: false
     },
     customInterest: ''
   });
@@ -325,7 +432,7 @@ const PlannerForm = ({ onSubmit, id }) => {
               <input
                 type="text"
                 required
-                placeholder="e.g., Tokyo, Paris, Bali"
+                placeholder="e.g., Tokyo, Paris, New York"
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
                 value={formData.destination}
                 onChange={(e) => setFormData({...formData, destination: e.target.value})}
@@ -491,17 +598,49 @@ const ItineraryView = ({ itinerary, formData, onReset }) => {
                       </div>
                       <div className="ml-5 flex-1">
                         <div className="flex justify-between items-start">
-                          <h4 className="text-base font-bold text-gray-900">{activity.title}</h4>
-                          <span className="text-xs text-gray-400 font-mono bg-gray-50 px-2 py-1 rounded">{activity.time}</span>
+                          <div>
+                            <a 
+                              href={activity.url} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="text-base font-bold text-gray-900 hover:text-blue-600 transition-colors flex items-center"
+                            >
+                              {activity.title}
+                              <ExternalLink className="w-3 h-3 ml-2 text-gray-400" />
+                            </a>
+                            <div className="flex items-center text-xs text-gray-500 mt-1 space-x-3">
+                              <span className="bg-gray-100 px-2 py-0.5 rounded flex items-center">
+                                <Clock className="w-3 h-3 mr-1" /> {activity.time}
+                              </span>
+                              <span className="flex items-center">
+                                <MapPin className="w-3 h-3 mr-1 text-gray-400" />
+                                {activity.location}
+                              </span>
+                            </div>
+                          </div>
+                          
+                          <div className="text-right flex-shrink-0 ml-4">
+                             <div className="flex items-center justify-end font-bold text-gray-900 bg-green-50 px-3 py-1 rounded-full border border-green-100">
+                               <DollarSign className="w-3 h-3 mr-1 text-green-600" />
+                               {activity.cost.replace('$', '')}
+                             </div>
+                          </div>
                         </div>
-                        <p className="mt-1 text-sm text-gray-500">
-                          Perfect for your <span className="font-semibold text-blue-500 capitalize">{activity.type}</span> interest. 
-                          Includes reserved entry and guide.
+                        
+                        <p className="mt-3 text-sm text-gray-600 leading-relaxed bg-gray-50/50 p-3 rounded-lg border border-gray-100">
+                          {activity.description}
                         </p>
-                        <div className="mt-3 flex items-center space-x-4">
-                          <button className="text-xs font-medium text-blue-600 hover:text-blue-800 flex items-center">
-                            View Details <ArrowRight className="w-3 h-3 ml-1" />
-                          </button>
+                        
+                        <div className="mt-3 flex items-center justify-between">
+                           <span className="text-xs text-blue-500 font-semibold uppercase tracking-wider">{activity.type}</span>
+                           <a 
+                             href={activity.url}
+                             target="_blank" 
+                             rel="noopener noreferrer"
+                             className="text-xs font-bold text-blue-600 hover:text-blue-800 flex items-center transition-colors bg-blue-50 px-3 py-1.5 rounded-full hover:bg-blue-100"
+                           >
+                             Visit Website <ArrowRight className="w-3 h-3 ml-1" />
+                           </a>
                         </div>
                       </div>
                     </div>
