@@ -1,0 +1,680 @@
+import React, { useState, useEffect } from 'react';
+import { 
+  MapPin, 
+  Calendar, 
+  Users, 
+  DollarSign, 
+  Search, 
+  Plane, 
+  Hotel, 
+  Utensils, 
+  Camera, 
+  Sun, 
+  Moon, 
+  Star, 
+  CheckCircle,
+  ArrowRight,
+  Menu,
+  X,
+  Sparkles,
+  Tag,
+  Clock,
+  Plus
+} from 'lucide-react';
+
+// --- Mock Data & AI Simulation Helpers ---
+
+const ACTIVITY_DATABASE = {
+  Adventure: [
+    "Zip-lining through the canopy",
+    "White-water rafting expedition",
+    "Sunrise mountain hike",
+    "Off-road 4x4 safari tour",
+    "Scuba diving intro course",
+    "Rock climbing for beginners",
+    "Jet ski coastal tour"
+  ],
+  Relaxing: [
+    "Private beach yoga session",
+    "Full-day luxury spa pass",
+    "Sunset catamaran cruise",
+    "Botanical garden meditation walk",
+    "Book reading by the pool",
+    "Hot springs soak",
+    "Hammock lounging with cocktails"
+  ],
+  Cultural: [
+    "Guided historical city tour",
+    "Local cooking masterclass",
+    "Museum of Ancient History visit",
+    "Traditional dance performance",
+    "Art gallery hop",
+    "Visit to iconic landmarks",
+    "Local language workshop"
+  ],
+  Foodie: [
+    "Street food market crawl",
+    "Michelin-star tasting menu",
+    "Vineyard tour and wine tasting",
+    "Farm-to-table lunch experience",
+    "Hidden cafe discovery tour",
+    "Chocolate making workshop",
+    "Seafood feast by the harbor"
+  ],
+  Family: [
+    "Interactive science museum",
+    "Theme park day pass",
+    "Family-friendly wildlife sanctuary",
+    "Beach sandcastle competition",
+    "Ice cream tasting tour",
+    "Kids adventure playground",
+    "Aquarium visit"
+  ]
+};
+
+const DEALS_DATABASE = [
+  { type: 'Hotel', title: 'Grand Resort & Spa', discount: '25% OFF', price: '$150/night', rating: 4.8 },
+  { type: 'Flight', title: 'Global Air Bundle', discount: 'Save $200', price: 'Roundtrip', rating: 4.5 },
+  { type: 'Activity', title: 'City Pass', discount: 'Buy 1 Get 1', price: '$45', rating: 4.7 },
+  { type: 'Dining', title: 'Sunset Dinner Cruise', discount: '15% OFF', price: '$80/pp', rating: 4.9 },
+];
+
+const generateItinerary = (formData) => {
+  const days = parseInt(formData.duration) || 3;
+  const itinerary = [];
+  
+  const interests = Object.keys(formData.interests).filter(k => formData.interests[k]);
+  
+  // Add custom interest if present
+  if (formData.customInterest && formData.customInterest.trim() !== '') {
+    interests.push(formData.customInterest.trim());
+  }
+
+  // Fallback if no interest selected
+  if (interests.length === 0) interests.push('Cultural', 'Relaxing');
+
+  for (let i = 1; i <= days; i++) {
+    const dayActivities = [];
+    
+    // Morning Activity
+    const morningType = interests[(i - 1) % interests.length]; // Use i-1 to start at 0
+    dayActivities.push(generateActivity(morningType, '09:00 AM'));
+
+    // Lunch
+    dayActivities.push({
+      time: '01:00 PM',
+      title: 'Local Lunch Spot',
+      type: 'Foodie',
+      icon: <Utensils className="w-4 h-4" />
+    });
+
+    // Afternoon Activity
+    // Use modulo logic to cycle through interests
+    const afternoonType = interests[i % interests.length];
+    dayActivities.push(generateActivity(afternoonType, '03:00 PM'));
+
+    // Dinner/Evening
+    dayActivities.push({
+      time: '07:30 PM',
+      title: 'Evening Entertainment & Dinner',
+      type: 'Relaxing',
+      icon: <Moon className="w-4 h-4" />
+    });
+
+    itinerary.push({ day: i, activities: dayActivities });
+  }
+  return itinerary;
+};
+
+// Helper to handle both database and custom activities
+const generateActivity = (type, time) => {
+  let title;
+  
+  // Check if it's a known category
+  if (ACTIVITY_DATABASE[type]) {
+    title = ACTIVITY_DATABASE[type][Math.floor(Math.random() * ACTIVITY_DATABASE[type].length)];
+  } else {
+    // Generate a title for custom interest
+    const templates = [
+      `Exclusive ${type} Experience`,
+      `Private ${type} Workshop`,
+      `Guided ${type} Tour`,
+      `Local ${type} Discovery`,
+      `Best of ${type} Visit`
+    ];
+    title = templates[Math.floor(Math.random() * templates.length)];
+  }
+
+  return {
+    time: time,
+    title: title,
+    type: type, // This will display the custom string (e.g., "Bird Watching")
+    icon: getIconForType(type)
+  };
+};
+
+const getIconForType = (type) => {
+  switch(type) {
+    case 'Adventure': return <Camera className="w-4 h-4" />;
+    case 'Relaxing': return <Sun className="w-4 h-4" />;
+    case 'Cultural': return <Star className="w-4 h-4" />;
+    case 'Foodie': return <Utensils className="w-4 h-4" />;
+    case 'Family': return <Users className="w-4 h-4" />;
+    default: return <Sparkles className="w-4 h-4 text-purple-500" />; // Custom icon
+  }
+};
+
+// --- Components ---
+
+const Header = ({ onReset }) => (
+  <header className="bg-white shadow-sm sticky top-0 z-50">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="flex justify-between items-center h-16">
+        <div className="flex items-center cursor-pointer" onClick={onReset}>
+          <div className="bg-blue-600 p-2 rounded-lg mr-2">
+            <Plane className="h-6 w-6 text-white" />
+          </div>
+          <span className="font-bold text-xl tracking-tight text-gray-900">Ultimate<span className="text-blue-600">Dest</span></span>
+        </div>
+        <nav className="hidden md:flex space-x-8">
+          <a href="#" className="text-gray-500 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">Destinations</a>
+          <a href="#" className="text-gray-500 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">Deals</a>
+          <a href="#" className="text-gray-500 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">About AI</a>
+          <button className="bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-blue-700 transition-colors">
+            Sign In
+          </button>
+        </nav>
+        <div className="md:hidden">
+          <Menu className="h-6 w-6 text-gray-500" />
+        </div>
+      </div>
+    </div>
+  </header>
+);
+
+const Hero = ({ scrollToForm }) => (
+  <div className="relative bg-white overflow-hidden">
+    <div className="max-w-7xl mx-auto">
+      <div className="relative z-10 pb-8 bg-white sm:pb-16 md:pb-20 lg:max-w-2xl lg:w-full lg:pb-28 xl:pb-32">
+        <main className="mt-10 mx-auto max-w-7xl px-4 sm:mt-12 sm:px-6 md:mt-16 lg:mt-20 lg:px-8 xl:mt-28">
+          <div className="sm:text-center lg:text-left">
+            <h1 className="text-4xl tracking-tight font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
+              <span className="block xl:inline">Your dream trip,</span>{' '}
+              <span className="block text-blue-600 xl:inline">planned by AI.</span>
+            </h1>
+            <p className="mt-3 text-base text-gray-500 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0">
+              The Ultimate Destination creates personalized itineraries for all ages in seconds. We find the hidden gems and the best deals, tailored specifically to your travel style.
+            </p>
+            <div className="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start">
+              <div className="rounded-md shadow">
+                <button
+                  onClick={scrollToForm}
+                  className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 md:py-4 md:text-lg md:px-10"
+                >
+                  Start Planning
+                </button>
+              </div>
+              <div className="mt-3 sm:mt-0 sm:ml-3">
+                <button className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200 md:py-4 md:text-lg md:px-10">
+                  View Deals
+                </button>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+    <div className="lg:absolute lg:inset-y-0 lg:right-0 lg:w-1/2 bg-gray-50">
+      <img
+        className="h-56 w-full object-cover sm:h-72 md:h-96 lg:w-full lg:h-full opacity-90"
+        src="https://images.unsplash.com/photo-1506929562872-bb421503ef21?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+        alt="Tropical beach vacation"
+      />
+      <div className="absolute inset-0 bg-gradient-to-r from-white via-white/20 to-transparent lg:via-white/10"></div>
+    </div>
+  </div>
+);
+
+const Features = () => (
+  <div className="py-12 bg-gray-50">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="lg:text-center">
+        <h2 className="text-base text-blue-600 font-semibold tracking-wide uppercase">Why Choose Us</h2>
+        <p className="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">
+          Travel Smarter, Not Harder
+        </p>
+      </div>
+      <div className="mt-10">
+        <div className="space-y-10 md:space-y-0 md:grid md:grid-cols-3 md:gap-x-8 md:gap-y-10">
+          {[
+            {
+              title: 'AI Personalization',
+              desc: 'Our engine learns your preferences to suggest activities you will actually love.',
+              icon: <Sparkles className="h-6 w-6 text-white" />
+            },
+            {
+              title: 'Family Friendly',
+              desc: 'Filters for "All Ages" ensure grandma and the toddlers both have a blast.',
+              icon: <Users className="h-6 w-6 text-white" />
+            },
+            {
+              title: 'Exclusive Deals',
+              desc: 'We automatically apply the best coupon codes and bundles found on the web.',
+              icon: <Tag className="h-6 w-6 text-white" />
+            }
+          ].map((feature, i) => (
+            <div key={i} className="flex flex-col items-center text-center">
+              <div className="flex items-center justify-center h-12 w-12 rounded-md bg-blue-500 text-white">
+                {feature.icon}
+              </div>
+              <h3 className="mt-5 text-lg leading-6 font-medium text-gray-900">{feature.title}</h3>
+              <p className="mt-2 text-base text-gray-500 max-w-xs">{feature.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+const PlannerForm = ({ onSubmit, id }) => {
+  const [formData, setFormData] = useState({
+    destination: '',
+    duration: 3,
+    travelers: 2,
+    budget: 'Moderate',
+    interests: {
+      Adventure: false,
+      Relaxing: false,
+      Cultural: false,
+      Foodie: false,
+      Family: false
+    },
+    customInterest: ''
+  });
+
+  const handleInterestChange = (interest) => {
+    setFormData(prev => ({
+      ...prev,
+      interests: { ...prev.interests, [interest]: !prev.interests[interest] }
+    }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (formData.destination.length < 2) return;
+    onSubmit(formData);
+  };
+
+  return (
+    <div id={id} className="max-w-4xl mx-auto px-4 py-16 sm:px-6 lg:px-8">
+      <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
+        <div className="bg-blue-600 px-6 py-4">
+          <h2 className="text-xl font-bold text-white flex items-center">
+            <Search className="mr-2" /> Plan Your Trip
+          </h2>
+        </div>
+        
+        <form onSubmit={handleSubmit} className="p-8 space-y-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Destination */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-700 flex items-center">
+                <MapPin className="w-4 h-4 mr-1 text-blue-500" /> Destination
+              </label>
+              <input
+                type="text"
+                required
+                placeholder="e.g., Tokyo, Paris, Bali"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
+                value={formData.destination}
+                onChange={(e) => setFormData({...formData, destination: e.target.value})}
+              />
+            </div>
+
+            {/* Duration */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-700 flex items-center">
+                <Calendar className="w-4 h-4 mr-1 text-blue-500" /> Duration (Days)
+              </label>
+              <input
+                type="number"
+                min="1"
+                max="14"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                value={formData.duration}
+                onChange={(e) => setFormData({...formData, duration: e.target.value})}
+              />
+            </div>
+
+            {/* Travelers */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-700 flex items-center">
+                <Users className="w-4 h-4 mr-1 text-blue-500" /> Travelers
+              </label>
+              <select
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                value={formData.travelers}
+                onChange={(e) => setFormData({...formData, travelers: e.target.value})}
+              >
+                {[1,2,3,4,5,6,7,8].map(n => <option key={n} value={n}>{n} {n === 1 ? 'Person' : 'People'}</option>)}
+              </select>
+            </div>
+
+            {/* Budget */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-700 flex items-center">
+                <DollarSign className="w-4 h-4 mr-1 text-blue-500" /> Budget Level
+              </label>
+              <select
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                value={formData.budget}
+                onChange={(e) => setFormData({...formData, budget: e.target.value})}
+              >
+                <option value="Budget">Budget Friendly ($)</option>
+                <option value="Moderate">Moderate ($$)</option>
+                <option value="Luxury">Luxury ($$$)</option>
+                <option value="Ultra">Ultra Luxury ($$$$)</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Interests */}
+          <div className="space-y-3">
+            <label className="text-sm font-medium text-gray-700">Trip Style / Interests</label>
+            <div className="flex flex-wrap gap-3">
+              {Object.keys(formData.interests).map((interest) => (
+                <button
+                  key={interest}
+                  type="button"
+                  onClick={() => handleInterestChange(interest)}
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                    formData.interests[interest]
+                      ? 'bg-blue-600 text-white shadow-md transform scale-105'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  }`}
+                >
+                  {interest}
+                </button>
+              ))}
+            </div>
+            
+            {/* Custom Interest Input */}
+            <div className="relative mt-2">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Plus className="h-4 w-4 text-gray-400" />
+              </div>
+              <input
+                type="text"
+                placeholder="Other Interest? (e.g. Photography, Shopping, Hiking)"
+                className="w-full pl-10 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm"
+                value={formData.customInterest}
+                onChange={(e) => setFormData({...formData, customInterest: e.target.value})}
+              />
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            className="w-full bg-blue-600 text-white font-bold py-4 rounded-lg hover:bg-blue-700 transition-colors shadow-lg flex items-center justify-center space-x-2"
+          >
+            <Sparkles className="w-5 h-5 animate-pulse" />
+            <span>Generate My Dream Itinerary</span>
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+const LoadingView = () => (
+  <div className="min-h-[60vh] flex flex-col items-center justify-center bg-gray-50 px-4">
+    <div className="relative">
+      <div className="w-24 h-24 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+      <div className="absolute top-0 left-0 w-24 h-24 flex items-center justify-center">
+        <Plane className="text-blue-600 w-8 h-8 animate-pulse" />
+      </div>
+    </div>
+    <h3 className="mt-8 text-xl font-bold text-gray-800">Designing your ultimate trip...</h3>
+    <div className="mt-4 space-y-2 text-center text-gray-500 text-sm">
+      <p className="animate-pulse">Checking local weather patterns...</p>
+      <p className="animate-pulse delay-75">Finding top-rated hidden gems...</p>
+      <p className="animate-pulse delay-150">Applying exclusive discounts...</p>
+    </div>
+  </div>
+);
+
+const ItineraryView = ({ itinerary, formData, onReset }) => {
+  return (
+    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto">
+        
+        {/* Header Section */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between mb-10">
+          <div>
+            <div className="flex items-center space-x-3">
+              <h2 className="text-3xl font-extrabold text-gray-900">Trip to {formData.destination}</h2>
+              <span className="px-3 py-1 bg-green-100 text-green-800 text-xs font-semibold rounded-full">
+                AI Generated
+              </span>
+            </div>
+            <p className="mt-2 text-gray-600">
+              {formData.duration} Days • {formData.travelers} Travelers • {formData.budget} Budget
+            </p>
+          </div>
+          <button 
+            onClick={onReset}
+            className="mt-4 md:mt-0 text-blue-600 hover:text-blue-800 font-medium flex items-center"
+          >
+            <Search className="w-4 h-4 mr-2" />
+            Plan Another Trip
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          
+          {/* Main Itinerary Column */}
+          <div className="lg:col-span-2 space-y-8">
+            {itinerary.map((day, index) => (
+              <div key={index} className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow">
+                <div className="bg-blue-50 px-6 py-4 border-b border-blue-100 flex justify-between items-center">
+                  <h3 className="text-lg font-bold text-blue-900">Day {day.day}</h3>
+                  <span className="text-sm text-blue-600 font-medium">{day.activities.length} Activities</span>
+                </div>
+                <div className="divide-y divide-gray-100">
+                  {day.activities.map((activity, idx) => (
+                    <div key={idx} className="p-6 flex items-start group">
+                      <div className="flex-shrink-0 mt-1">
+                        <div className="w-12 h-12 bg-gray-50 rounded-lg flex items-center justify-center text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                          {activity.icon}
+                        </div>
+                      </div>
+                      <div className="ml-5 flex-1">
+                        <div className="flex justify-between items-start">
+                          <h4 className="text-base font-bold text-gray-900">{activity.title}</h4>
+                          <span className="text-xs text-gray-400 font-mono bg-gray-50 px-2 py-1 rounded">{activity.time}</span>
+                        </div>
+                        <p className="mt-1 text-sm text-gray-500">
+                          Perfect for your <span className="font-semibold text-blue-500 capitalize">{activity.type}</span> interest. 
+                          Includes reserved entry and guide.
+                        </p>
+                        <div className="mt-3 flex items-center space-x-4">
+                          <button className="text-xs font-medium text-blue-600 hover:text-blue-800 flex items-center">
+                            View Details <ArrowRight className="w-3 h-3 ml-1" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Sidebar: Budget & Deals */}
+          <div className="lg:col-span-1 space-y-6">
+            
+            {/* Deals Card */}
+            <div className="bg-gradient-to-br from-indigo-600 to-purple-700 rounded-xl shadow-lg text-white overflow-hidden">
+              <div className="p-6 border-b border-indigo-500/30">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-bold text-xl flex items-center">
+                    <Tag className="w-5 h-5 mr-2" /> Exclusive Deals
+                  </h3>
+                  <span className="bg-white/20 text-xs px-2 py-1 rounded">Live</span>
+                </div>
+                <p className="text-indigo-200 text-sm mt-1">Found specially for your {formData.destination} trip.</p>
+              </div>
+              <div className="p-4 space-y-4">
+                {DEALS_DATABASE.map((deal, idx) => (
+                  <div key={idx} className="bg-white/10 rounded-lg p-4 backdrop-blur-sm hover:bg-white/20 transition-colors cursor-pointer border border-white/5">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <span className="text-xs font-bold text-yellow-300 uppercase tracking-wider">{deal.type}</span>
+                        <h4 className="font-bold text-sm mt-1">{deal.title}</h4>
+                        <div className="flex items-center text-xs text-indigo-200 mt-1">
+                          <Star className="w-3 h-3 fill-current text-yellow-400 mr-1" /> {deal.rating}
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-lg font-bold text-white">{deal.discount}</div>
+                        <div className="text-xs text-indigo-200">{deal.price}</div>
+                      </div>
+                    </div>
+                    <button className="w-full mt-3 bg-white text-indigo-600 text-xs font-bold py-2 rounded hover:bg-gray-100">
+                      Claim Offer
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Estimated Cost Summary */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+              <h3 className="font-bold text-gray-900 mb-4 flex items-center">
+                <DollarSign className="w-5 h-5 mr-2 text-green-600" /> Estimated Cost Breakdown
+              </h3>
+              <div className="space-y-3">
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600">Flights (Avg)</span>
+                  <span className="font-medium text-gray-900">$850</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600">Accommodation ({formData.duration} nights)</span>
+                  <span className="font-medium text-gray-900">${formData.duration * 150}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600">Activities & Food</span>
+                  <span className="font-medium text-gray-900">${formData.duration * 100 * formData.travelers}</span>
+                </div>
+                <div className="pt-3 border-t border-gray-100 flex justify-between items-center">
+                  <span className="font-bold text-gray-900">Total Estimate</span>
+                  <span className="text-xl font-bold text-green-600">
+                    ${850 + (formData.duration * 150) + (formData.duration * 100 * formData.travelers)}
+                  </span>
+                </div>
+                <p className="text-xs text-gray-400 mt-2 text-center">*Based on {formData.budget.toLowerCase()} pricing in {formData.destination}.</p>
+              </div>
+            </div>
+
+            {/* Map Placeholder */}
+            <div className="bg-gray-200 rounded-xl h-48 flex items-center justify-center relative overflow-hidden group cursor-pointer">
+              <img src="https://images.unsplash.com/photo-1524661135-423995f22d0b?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" className="absolute inset-0 w-full h-full object-cover opacity-50 group-hover:opacity-75 transition-opacity" alt="map" />
+              <button className="relative bg-white text-gray-900 px-4 py-2 rounded-lg font-bold text-sm shadow-lg group-hover:scale-105 transition-transform">
+                View Interactive Map
+              </button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// --- Main App Component ---
+
+const App = () => {
+  const [appState, setAppState] = useState('LANDING'); // LANDING, LOADING, RESULT
+  const [formData, setFormData] = useState(null);
+  const [itinerary, setItinerary] = useState(null);
+
+  const handleFormSubmit = (data) => {
+    setFormData(data);
+    setAppState('LOADING');
+    
+    // Simulate AI processing time
+    setTimeout(() => {
+      const generatedItinerary = generateItinerary(data);
+      setItinerary(generatedItinerary);
+      setAppState('RESULT');
+    }, 2500);
+  };
+
+  const handleReset = () => {
+    setAppState('LANDING');
+    setFormData(null);
+    setItinerary(null);
+  };
+
+  const scrollToForm = () => {
+    document.getElementById('planner-form').scrollIntoView({ behavior: 'smooth' });
+  };
+
+  return (
+    <div className="font-sans text-gray-900 bg-white min-h-screen">
+      <Header onReset={handleReset} />
+      
+      {appState === 'LANDING' && (
+        <>
+          <Hero scrollToForm={scrollToForm} />
+          <Features />
+          <PlannerForm id="planner-form" onSubmit={handleFormSubmit} />
+        </>
+      )}
+
+      {appState === 'LOADING' && <LoadingView />}
+
+      {appState === 'RESULT' && (
+        <ItineraryView 
+          itinerary={itinerary} 
+          formData={formData} 
+          onReset={handleReset} 
+        />
+      )}
+
+      {/* Footer */}
+      <footer className="bg-gray-900 text-white py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div className="col-span-1 md:col-span-2">
+            <h3 className="text-xl font-bold mb-4">The Ultimate Destination</h3>
+            <p className="text-gray-400 text-sm max-w-md">
+              We leverage cutting-edge AI to make travel planning effortless, personalized, and budget-friendly for everyone. Explore the world on your terms.
+            </p>
+          </div>
+          <div>
+            <h4 className="text-lg font-semibold mb-4">Company</h4>
+            <ul className="space-y-2 text-gray-400 text-sm">
+              <li className="hover:text-white cursor-pointer">About Us</li>
+              <li className="hover:text-white cursor-pointer">Careers</li>
+              <li className="hover:text-white cursor-pointer">Press</li>
+            </ul>
+          </div>
+          <div>
+            <h4 className="text-lg font-semibold mb-4">Support</h4>
+            <ul className="space-y-2 text-gray-400 text-sm">
+              <li className="hover:text-white cursor-pointer">Help Center</li>
+              <li className="hover:text-white cursor-pointer">Terms of Service</li>
+              <li className="hover:text-white cursor-pointer">Privacy Policy</li>
+            </ul>
+          </div>
+        </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 pt-8 border-t border-gray-800 text-center text-gray-500 text-sm">
+          © 2023 The Ultimate Destination. All rights reserved.
+        </div>
+      </footer>
+    </div>
+  );
+};
+
+export default App;
