@@ -22,240 +22,216 @@ import {
   Plus,
   Trophy,
   Info,
-  ExternalLink
+  ExternalLink,
+  Map,
+  Baby,
+  Briefcase,
+  Ticket
 } from 'lucide-react';
 
-// --- Mock Data: Specific City Databases ---
+// --- Mock Data: Specific City Databases with Real Hours & Direct Links ---
 
 const CITY_DATA = {
   paris: {
     Adventure: [
-      { title: "Catacombs Exploration", location: "1 Av. du Colonel Henri Rol-Tanguy", cost: "$35", description: "Descend into the underground ossuaries holding the remains of over six million people." },
-      { title: "Seine River Night Cruise", location: "Port de la Bourdonnais", cost: "$20", description: "See the City of Lights sparkle from the water on a Bateaux Parisiens boat tour." }
+      { title: "Catacombs Exploration", location: "1 Av. du Colonel Henri Rol-Tanguy", cost: "$29", hours: "Tue-Sun: 9:45 AM - 8:30 PM", description: "Descend into the underground ossuaries holding the remains of over six million people.", url: "https://www.catacombes.paris.fr/en" },
+      { title: "Seine River Night Cruise", location: "Port de la Bourdonnais", cost: "$18", hours: "Daily: 10:00 AM - 10:30 PM", description: "See the City of Lights sparkle from the water on a Bateaux Parisiens boat tour.", url: "https://www.bateauxparisiens.com/en" },
+      { title: "Hot Air Balloon Ride", location: "Parc André Citroën", cost: "$180", hours: "Daily: 9:00 AM - Sunset", description: "Get a bird's eye view of Paris from the Ballon de Paris Generali.", url: "https://www.ballondeparis.com/en/" },
+      { title: "Paris Sewer Museum", location: "Pont de l'Alma", cost: "$9", hours: "Tue-Sun: 10:00 AM - 5:00 PM", description: "Explore the fascinating underbelly of the city's historic sewer system.", url: "https://musee-egouts.paris.fr/en/" },
+      { title: "Climb the Arc de Triomphe", location: "Champs-Élysées", cost: "$13", hours: "Daily: 10:00 AM - 10:30 PM", description: "Climb the 284 steps for one of the best panoramic views of the Eiffel Tower.", url: "https://www.paris-arc-de-triomphe.fr/en/" },
+      { title: "Retro Sidecar Tour", location: "City Center", cost: "$90", hours: "Daily: 9 AM - 10 PM", description: "Zip around Paris in a vintage motorcycle sidecar.", url: "https://www.retro-tour.com/paris/" }
     ],
     Relaxing: [
-      { title: "Picnic at Luxembourg Gardens", location: "Jardin du Luxembourg", cost: "Free", description: "Relax on the iconic green chairs by the central fountain in this 17th-century park." },
-      { title: "Spa Day at The Ritz", location: "Place Vendôme", cost: "$250", description: "Indulge in a world-class luxury spa treatment in the heart of Paris." }
+      { title: "Picnic at Luxembourg Gardens", location: "Jardin du Luxembourg", cost: "Free", hours: "Daily: 7:30 AM - Dusk", description: "Relax on the iconic green chairs by the central fountain in this 17th-century park." },
+      { title: "Spa Day at The Ritz", location: "Place Vendôme", cost: "$250", hours: "Daily: 9:00 AM - 9:00 PM", description: "Indulge in a world-class luxury spa treatment in the heart of Paris.", url: "https://www.ritzparis.com/en-GB/ritz-club" },
+      { title: "Tuileries Garden Stroll", location: "Rue de Rivoli", cost: "Free", hours: "Daily: 7:00 AM - 9:00 PM", description: "Wander through the royal gardens located between the Louvre and Place de la Concorde." },
+      { title: "Sunset at Sacré-Cœur", location: "Montmartre", cost: "Free", hours: "Basilica: 6:00 AM - 10:30 PM", description: "Watch the sun set over the city from the steps of the basilica." },
+      { title: "Shakespeare & Company", location: "Left Bank", cost: "Free", hours: "Mon-Sat: 10:00 AM - 8:00 PM", description: "Visit the world-famous English-language bookstore and reading room.", url: "https://shakespeareandcompany.com/" },
+      { title: "Canal Saint-Martin Walk", location: "10th Arrondissement", cost: "Free", hours: "24 Hours", description: "Watch the locks operate and skim stones on this trendy waterway." }
     ],
     Cultural: [
-      { title: "Louvre Museum Private Tour", location: "Rue de Rivoli", cost: "$90", description: "Skip the line and see the Mona Lisa and Venus de Milo with an expert art historian." },
-      { title: "Eiffel Tower Summit Access", location: "Champ de Mars", cost: "$45", description: "Ride the glass elevator to the very top for panoramic views of the entire city." }
+      { title: "Louvre Museum Private Tour", location: "Rue de Rivoli", cost: "$90", hours: "Wed-Mon: 9:00 AM - 6:00 PM", description: "Skip the line and see the Mona Lisa and Venus de Milo with an expert art historian.", url: "https://www.louvre.fr/en" },
+      { title: "Eiffel Tower Summit Access", location: "Champ de Mars", cost: "$45", hours: "Daily: 9:30 AM - 11:45 PM", description: "Ride the glass elevator to the very top for panoramic views of the entire city.", url: "https://www.toureiffel.paris/en" },
+      { title: "Musée d'Orsay", location: "Left Bank", cost: "$17", hours: "Tue-Sun: 9:30 AM - 6:00 PM", description: "Admire the world's largest collection of Impressionist and post-Impressionist masterpieces.", url: "https://www.musee-orsay.fr/en" },
+      { title: "Sainte-Chapelle", location: "Île de la Cité", cost: "$13", hours: "Daily: 9:00 AM - 7:00 PM", description: "Marvel at the 1,113 stained glass windows depicting scenes from the Bible.", url: "https://www.sainte-chapelle.fr/en/" },
+      { title: "Palace of Versailles", location: "Versailles", cost: "$25", hours: "Tue-Sun: 9:00 AM - 6:30 PM", description: "Explore the Hall of Mirrors and the opulent royal apartments of Louis XIV.", url: "https://en.chateauversailles.fr/" },
+      { title: "Opera Garnier Tour", location: "Place de l'Opéra", cost: "$15", hours: "Daily: 10:00 AM - 5:00 PM", description: "Visit the phantom's lair in this masterpiece of 19th-century theater architecture.", url: "https://www.operadeparis.fr/en/visits/palais-garnier" }
     ],
     Foodie: [
-      { title: "Macaron Baking Class", location: "Le Marais", cost: "$110", description: "Learn the secrets of making the perfect French macaron with a professional pastry chef." },
-      { title: "Dinner at Le Jules Verne", location: "Eiffel Tower 2nd Floor", cost: "$300", description: "Fine dining experience with arguably the best view in the world." }
+      { title: "Le Jules Verne", location: "Eiffel Tower 2nd Floor", cost: "$300", hours: "Daily: 7:00 PM - 10:00 PM", description: "Fine dining experience with arguably the best view in the world.", url: "https://www.lejulesverne-paris.com/" },
+      { title: "Ladurée Tea Time", location: "Champs-Élysées", cost: "$45", hours: "Daily: 8:00 AM - 9:30 PM", description: "Enjoy the world's most famous macarons in a historic salon de thé.", url: "https://www.laduree.fr/en/" },
+      { title: "Café de Flore", location: "Saint-Germain", cost: "$30", hours: "Daily: 7:30 AM - 1:30 AM", description: "Sip hot chocolate at the table where Sartre and Hemingway once wrote.", url: "https://cafedeflore.fr/" },
+      { title: "Le Train Bleu", location: "Gare de Lyon", cost: "$90", hours: "Daily: 11:30 AM - 2:30 PM", description: "Dine in a stunning Belle Époque setting inside a train station.", url: "https://www.le-train-bleu.com/en/" },
+      { title: "Angelina Paris", location: "Rue de Rivoli", cost: "$25", hours: "Daily: 8:00 AM - 7:00 PM", description: "Famous for their thick, rich African Hot Chocolate.", url: "https://www.angelina-paris.fr/" },
+      { title: "L'As du Fallafel", location: "Le Marais", cost: "$15", hours: "Sun-Thu: 11 AM - 11 PM", description: "The most famous falafel sandwich in Paris.", url: "http://l-as-du-fallafel.zenchef.com/" }
     ],
     Family: [
-      { title: "Disneyland Paris Day Trip", location: "Marne-la-Vallée", cost: "$130", description: "Meet Mickey and explore the magical lands just a train ride away from the city center." },
-      { title: "Jardin d'Acclimatation", location: "Bois de Boulogne", cost: "$35", description: "A historic amusement park with puppet shows, roller coasters, and a petting zoo." }
+      { title: "Disneyland Paris", location: "Marne-la-Vallée", cost: "$105", hours: "Daily: 9:30 AM - 10:00 PM", description: "Meet Mickey and explore the magical lands just a train ride away from the city center.", url: "https://www.disneylandparis.com/" },
+      { title: "Jardin d'Acclimatation", location: "Bois de Boulogne", cost: "$35", hours: "Daily: 10:00 AM - 7:00 PM", description: "A historic amusement park with puppet shows, roller coasters, and a petting zoo.", url: "https://www.jardindacclimatation.fr/en" },
+      { title: "Aquarium de Paris", location: "Trocadéro", cost: "$25", hours: "Daily: 10:00 AM - 7:00 PM", description: "See sharks and tropical fish in the gardens right across from the Eiffel Tower.", url: "https://www.aquariumdeparis.com/" },
+      { title: "Cité des Sciences", location: "Parc de la Villette", cost: "$13", hours: "Tue-Sun: 10:00 AM - 6:00 PM", description: "Huge science museum with a planetarium and submarine exploration.", url: "https://www.cite-sciences.fr/en/home" }
     ],
     Sports: [
-      { title: "PSG Stadium Tour", location: "Parc des Princes", cost: "$30", description: "Go behind the scenes of Paris Saint-Germain's legendary home stadium." },
-      { title: "Tennis at Roland-Garros", location: "Avenue Gordon Bennett", cost: "$50", description: "Visit the clay courts famous for the French Open." }
+      { title: "PSG vs Marseille", location: "Parc des Princes", cost: "$150", hours: "Kickoff: 9:00 PM", description: "Watch Paris Saint-Germain take on their biggest rivals in 'Le Classique'.", url: "https://www.ticketmaster.fr/en/salle/parc-des-princes/idsalle/53" },
+      { title: "French Open Tennis", location: "Roland-Garros", cost: "$200", hours: "Matches start: 11:00 AM", description: "Watch world-class clay court tennis action.", url: "https://tickets.rolandgarros.com/en" }
     ]
   },
   tokyo: {
     Adventure: [
-      { title: "Go-Karting in Akihabara", location: "Akihabara District", cost: "$80", description: "Drive through the streets of Tokyo dressed as your favorite video game character." },
-      { title: "TeamLab Planets", location: "Toyosu", cost: "$35", description: "Walk through water and interact with digital art in this immersive museum experience." }
+      { title: "Street Kart Tour", location: "Akihabara", cost: "$80", hours: "Daily: 10:00 AM - 10:00 PM", description: "Drive through the streets of Tokyo in a costume.", url: "https://kart.st/" },
+      { title: "TeamLab Planets", location: "Toyosu", cost: "$35", hours: "Daily: 9:00 AM - 10:00 PM", description: "Walk through water and interact with digital art.", url: "https://planets.teamlab.art/tokyo/" },
+      { title: "Tokyo Skytree", location: "Sumida", cost: "$30", hours: "Daily: 10:00 AM - 9:00 PM", description: "Views from the tallest tower in the world.", url: "https://www.tokyo-skytree.jp/en/" },
+      { title: "Ninja Experience", location: "Asakusa", cost: "$60", hours: "Wed-Sun: 10:00 AM - 6:00 PM", description: "Learn the ways of the ninja, including shuriken throwing.", url: "https://n-ninja.jp/" }
     ],
     Relaxing: [
-      { title: "Onsen Soak at Oedo Onsen", location: "Odaiba", cost: "$40", description: "Experience a traditional Japanese hot spring theme park with Edo-period atmosphere." },
-      { title: "Ueno Park Cherry Blossoms", location: "Ueno", cost: "Free", description: "Stroll beneath thousands of cherry trees (seasonal) or enjoy the serene pond views." }
+      { title: "Oedo Onsen Monogatari", location: "Urayasu", cost: "$25", hours: "Daily: 11:00 AM - 9:00 AM", description: "Traditional hot spring theme park.", url: "https://urayasu.ooedonsen.jp/" },
+      { title: "Ueno Park Stroll", location: "Ueno", cost: "Free", hours: "Daily: 5:00 AM - 11:00 PM", description: "Stroll beneath thousands of cherry trees.", url: "https://www.kensetsu.metro.tokyo.lg.jp/jimusho/toubuk/ueno/en_index.html" },
+      { title: "Hama Rikyu Gardens", location: "Chuo City", cost: "$3", hours: "Daily: 9:00 AM - 5:00 PM", description: "Seawater pond garden with a tea house.", url: "https://www.tokyo-park.or.jp/park/format/index028.html" }
     ],
     Cultural: [
-      { title: "Senso-ji Temple Visit", location: "Asakusa", cost: "Free", description: "Tokyo's oldest temple, famed for its giant red lantern and Nakamise shopping street." },
-      { title: "Meiji Jingu Shrine", location: "Shibuya", cost: "Free", description: "A tranquil Shinto shrine located in a lush forest in the middle of the city." }
+      { title: "Senso-ji Temple", location: "Asakusa", cost: "Free", hours: "Main Hall: 6:00 AM - 5:00 PM", description: "Tokyo's oldest temple.", url: "https://www.senso-ji.jp/english/" },
+      { title: "Meiji Jingu Shrine", location: "Shibuya", cost: "Free", hours: "Daily: Sunrise - Sunset", description: "Tranquil Shinto shrine in a forest.", url: "https://www.meijijingu.or.jp/en/" },
+      { title: "Kabuki-za Theatre", location: "Ginza", cost: "$40", hours: "Shows: 11:00 AM & 4:30 PM", description: "Traditional Kabuki performance.", url: "https://www.kabukiweb.net/" }
     ],
     Foodie: [
-      { title: "Tsukiji Outer Market Tour", location: "Tsukiji", cost: "$60", description: "Sample fresh sushi, tamagoyaki, and seafood delicacies in this historic market." },
-      { title: "Ramen Street Tasting", location: "Tokyo Station", cost: "$25", description: "Try different regional styles of ramen in the famous underground food street." }
+      { title: "Sukiyabashi Jiro", location: "Roppongi", cost: "$300", hours: "Mon-Sat: 11:30 AM - 2:00 PM", description: "World-famous sushi experience.", url: "https://www.sushi-jiro.jp/" },
+      { title: "Ichiran Ramen", location: "Shibuya", cost: "$15", hours: "24 Hours", description: "Famous solo-booth tonkotsu ramen.", url: "https://ichiran.com/en/" },
+      { title: "Gonpachi (Kill Bill)", location: "Nishi-Azabu", cost: "$60", hours: "Daily: 11:30 AM - 3:30 AM", description: "The restaurant that inspired the Kill Bill fight scene.", url: "https://gonpachi.jp/nishi-azabu/" },
+      { title: "Robot Restaurant", location: "Shinjuku", cost: "$80", hours: "Daily: 3:00 PM - 11:00 PM", description: "High-energy show with robots and lasers (Check reopening).", url: "https://www.shinjuku-robot.com/" }
     ],
     Family: [
-      { title: "Ghibli Museum", location: "Mitaka", cost: "$15", description: "Whimsical museum showcasing the work of the legendary Studio Ghibli animation studio." },
-      { title: "Tokyo DisneySea", location: "Urayasu", cost: "$95", description: "A nautical-themed park unique to Japan, known for its incredible atmosphere." }
+      { title: "Tokyo DisneySea", location: "Urayasu", cost: "$80", hours: "Daily: 9:00 AM - 9:00 PM", description: "Nautical-themed park unique to Japan.", url: "https://www.tokyodisneyresort.jp/en/tds/" },
+      { title: "Ghibli Museum", location: "Mitaka", cost: "$10", hours: "Wed-Mon: 10:00 AM - 6:00 PM", description: "Whimsical museum for Studio Ghibli fans.", url: "https://www.ghibli-museum.jp/en/" },
+      { title: "Pokemon Center", location: "Ikebukuro", cost: "Free", hours: "Daily: 10:00 AM - 8:00 PM", description: "Ultimate Pokemon store.", url: "https://www.pokemon.co.jp/shop/en/" }
     ],
     Sports: [
-      { title: "Sumo Wrestling Practice", location: "Ryogoku", cost: "$40", description: "Watch morning practice at a sumo stable to see the wrestlers' intense training." },
-      { title: "Baseball at Tokyo Dome", location: "Bunkyo", cost: "$55", description: "Cheer for the Yomiuri Giants in Japan's most famous indoor stadium." }
+      { title: "Yomiuri Giants vs Hanshin Tigers", location: "Tokyo Dome", cost: "$55", hours: "Game Time: 6:00 PM", description: "Classic baseball rivalry game.", url: "https://www.ticketmaster.com/tokyo-dome-tickets-tokyo/venue/452329" },
+      { title: "Grand Sumo Tournament", location: "Ryogoku Kokugikan", cost: "$40", hours: "Starts: 8:00 AM", description: "Watch traditional sumo wrestling matches.", url: "https://www.sumo.or.jp/EnTicket/" }
     ]
   },
   "new york": {
     Adventure: [
-      { title: "Helicopter Tour of Manhattan", location: "Downtown Heliport", cost: "$220", description: "See the Statue of Liberty and Empire State Building from the sky." },
-      { title: "Top of the Rock Observation", location: "Rockefeller Center", cost: "$45", description: "Enjoy 360-degree unobstructed views of Central Park and the skyline." }
+      { title: "Manhattan Helicopter Tour", location: "Downtown Heliport", cost: "$220", hours: "Mon-Sat: 9:00 AM - 5:30 PM", description: "See the Statue of Liberty from the sky.", url: "https://www.zipaviation.com/" },
+      { title: "Top of the Rock", location: "Rockefeller Center", cost: "$45", hours: "Daily: 9:00 AM - 11:00 PM", description: "360-degree views of NYC.", url: "https://www.topoftherocknyc.com/" },
+      { title: "The Edge", location: "Hudson Yards", cost: "$40", hours: "Daily: 10:00 AM - 10:00 PM", description: "Highest outdoor sky deck.", url: "https://www.edgenyc.com/en" },
+      { title: "SUMMIT One Vanderbilt", location: "Midtown", cost: "$42", hours: "Daily: 9:00 AM - 10:30 PM", description: "Immersive mirrored observation deck.", url: "https://summitov.com/" }
     ],
     Relaxing: [
-      { title: "Central Park Boat Rental", location: "Loeb Boathouse", cost: "$25", description: "Row a boat on The Lake for a peaceful escape in the middle of the city." },
-      { title: "High Line Walk", location: "Chelsea / Meatpacking", cost: "Free", description: "Walk along the elevated historic rail line converted into a public park." }
+      { title: "Central Park Boating", location: "Loeb Boathouse", cost: "$25", hours: "Daily: 10:00 AM - Dusk", description: "Row a boat on The Lake.", url: "https://centralparkboathouse.com/" },
+      { title: "High Line Walk", location: "Chelsea", cost: "Free", hours: "Daily: 7:00 AM - 10:00 PM", description: "Walk along the elevated historic rail line.", url: "https://www.thehighline.org/" },
+      { title: "Aire Ancient Baths", location: "Tribeca", cost: "$150", hours: "Daily: 9:00 AM - 11:00 PM", description: "Thermal baths in a restored textile factory.", url: "https://beaire.com/en/aire-ancient-baths-newyork" }
     ],
     Cultural: [
-      { title: "Broadway Show", location: "Theater District", cost: "$150", description: "Experience the magic of a world-class musical or play on Broadway." },
-      { title: "The MET Museum", location: "5th Avenue", cost: "$30", description: "Explore 5,000 years of art from around the globe in one of the world's largest museums." }
+      { title: "Hamilton on Broadway", location: "Richard Rodgers Theatre", cost: "$199", hours: "Tue-Sun: 7:00 PM", description: "The hit musical about the founding father.", url: "https://hamiltonmusical.com/new-york/tickets" },
+      { title: "The Met Museum", location: "5th Avenue", cost: "$30", hours: "Daily: 10 AM - 5 PM", description: "Explore 5,000 years of art.", url: "https://www.metmuseum.org/" },
+      { title: "MoMA", location: "Midtown", cost: "$25", hours: "Daily: 10:30 AM - 5:30 PM", description: "Modern art masterpieces.", url: "https://www.moma.org/" },
+      { title: "9/11 Memorial", location: "WTC", cost: "$28", hours: "Wed-Mon: 10 AM - 5 PM", description: "Tribute to 9/11 victims.", url: "https://www.911memorial.org/" }
     ],
     Foodie: [
-      { title: "Pizza Walking Tour", location: "Greenwich Village", cost: "$65", description: "Sample slices from 3 distinct pizzerias and learn the history of NY pie." },
-      { title: "Chelsea Market Food Crawl", location: "Chelsea", cost: "$40", description: "Taste tacos, artisan doughnuts, and spices in this bustling indoor market." }
+      { title: "Katz's Delicatessen", location: "Lower East Side", cost: "$25", hours: "Daily: 8:00 AM - 10:45 PM", description: "Legendary pastrami on rye.", url: "https://katzsdelicatessen.com/" },
+      { title: "Peter Luger Steak House", location: "Brooklyn", cost: "$120", hours: "Daily: 11:45 AM - 9:45 PM", description: "One of the oldest and best steakhouses.", url: "https://peterluger.com/" },
+      { title: "Le Bernardin", location: "Midtown", cost: "$200", hours: "Mon-Sat: 5:00 PM - 10:30 PM", description: "3-Michelin star seafood.", url: "https://www.le-bernardin.com/" },
+      { title: "Joe's Pizza", location: "Greenwich Village", cost: "$5", hours: "Daily: 10:00 AM - 3:00 AM", description: "The quintessential NY slice.", url: "http://www.joespizzanyc.com/" }
     ],
     Family: [
-      { title: "American Museum of Natural History", location: "Upper West Side", cost: "$28", description: "See the giant T-Rex skeleton and the massive blue whale model." },
-      { title: "Bronx Zoo", location: "The Bronx", cost: "$35", description: "Visit one of the largest metropolitan zoos in the world." }
+      { title: "Museum of Natural History", location: "UWS", cost: "$28", hours: "Daily: 10 AM - 5:30 PM", description: "Dinosaurs and the blue whale.", url: "https://www.amnh.org/" },
+      { title: "Bronx Zoo", location: "Bronx", cost: "$35", hours: "Daily: 10 AM - 5 PM", description: "World-class city zoo.", url: "https://bronxzoo.com/" },
+      { title: "Color Factory", location: "Soho", cost: "$38", hours: "Daily: 9:00 AM - 8:00 PM", description: "Interactive color exhibits.", url: "https://colorfactory.co/new-york-city/" }
     ],
     Sports: [
-      { title: "Yankees Game", location: "Yankee Stadium", cost: "$60", description: "Catch a baseball game in the Bronx at the home of the 27-time champions." },
-      { title: "Knicks Game at MSG", location: "Madison Square Garden", cost: "$120", description: "Experience the electric atmosphere of basketball at 'The World's Most Famous Arena'." }
+      { title: "Knicks vs Celtics", location: "Madison Square Garden", cost: "$150", hours: "Tip-off: 7:30 PM", description: "NBA action at the world's most famous arena.", url: "https://www.ticketmaster.com/new-york-knicks-tickets/artist/805988" },
+      { title: "Yankees vs Red Sox", location: "Yankee Stadium", cost: "$80", hours: "First Pitch: 7:05 PM", description: "The biggest rivalry in baseball.", url: "https://www.ticketmaster.com/new-york-yankees-tickets/artist/805992" }
+    ]
+  },
+  london: {
+    Adventure: [
+      { title: "Up at The O2", location: "Greenwich", cost: "$45", hours: "Daily: 10 AM - 6 PM", description: "Climb over the O2 arena.", url: "https://www.theo2.co.uk/up-at-the-o2" },
+      { title: "Thames Rockets", location: "London Eye Pier", cost: "$55", hours: "Daily: 10 AM - 6 PM", description: "High-speed RIB boat tour.", url: "https://www.thamesrockets.com/" }
+    ],
+    Relaxing: [
+      { title: "Kew Gardens", location: "Richmond", cost: "$20", hours: "Daily: 10 AM - 6 PM", description: "Royal Botanic Gardens.", url: "https://www.kew.org/" },
+      { title: "The Shard View", location: "London Bridge", cost: "$35", hours: "Daily: 10 AM - 10 PM", description: "Best view in London.", url: "https://www.theviewfromtheshard.com/" }
+    ],
+    Cultural: [
+      { title: "Tower of London", location: "City", cost: "$35", hours: "Daily: 9 AM - 5:30 PM", description: "Crown Jewels and torture history.", url: "https://www.hrp.org.uk/tower-of-london/" },
+      { title: "Hamilton", location: "Victoria Palace", cost: "$100", hours: "Mon-Sat: 7:30 PM", description: "The musical phenomenon.", url: "https://hamiltonmusical.com/london/" }
+    ],
+    Foodie: [
+      { title: "Dishoom", location: "Covent Garden", cost: "$40", hours: "Daily: 8 AM - 11 PM", description: "Famous Bombay cafe cuisine.", url: "https://www.dishoom.com/" },
+      { title: "Sketch (The Gallery)", location: "Mayfair", cost: "$100", hours: "Daily: 9 AM - 2 AM", description: "Iconic pink dining room and afternoon tea.", url: "https://sketch.london/" },
+      { title: "Duck & Waffle", location: "Bishopsgate", cost: "$60", hours: "24 Hours", description: "High-rise dining anytime.", url: "https://duckandwaffle.com/" }
+    ],
+    Family: [
+      { title: "Harry Potter Studios", location: "Leavesden", cost: "$60", hours: "Daily: 8:30 AM - 10 PM", description: "Making of Harry Potter tour.", url: "https://www.wbstudiotour.co.uk/" },
+      { title: "London Eye", location: "South Bank", cost: "$35", hours: "Daily: 11 AM - 6 PM", description: "Giant observation wheel.", url: "https://www.londoneye.com/" }
+    ],
+    Sports: [
+      { title: "Arsenal vs Tottenham", location: "Emirates Stadium", cost: "$120", hours: "Kickoff: 3:00 PM", description: "The North London Derby.", url: "https://www.ticketmaster.co.uk/arsenal-fc-tickets/artist/33796" },
+      { title: "Wimbledon Centre Court", location: "Wimbledon", cost: "$200", hours: "Start: 1:00 PM", description: "Grand Slam tennis action.", url: "https://www.ticketmaster.co.uk/wimbledon" }
     ]
   }
 };
 
-// --- Mock Data: Generic Database with Placeholders ---
-// Used when the city is not in the specific list above.
 const GENERIC_DATABASE = {
   Adventure: [
-    { title: "Zip-lining at {City} Eco Park", location: "{City} Outskirts", cost: "$85", description: "Soar above the landscape on a thrilling zip-line circuit." },
-    { title: "{City} River Rafting", location: "River Adventure Center", cost: "$110", description: "Navigate the local rapids with an expert guide." },
-    { title: "Sunrise Hike to {City} Peak", location: "Mountain Trailhead", cost: "Free", description: "A self-guided trek to a scenic viewpoint overlooking {City}." },
+    { title: "Zip-lining at {City} Eco Park", location: "{City} Outskirts", cost: "$85", hours: "Daily: 9:00 AM - 5:00 PM", description: "Soar above the landscape.", url: "https://www.viator.com" },
+    { title: "River Rafting", location: "Local River", cost: "$110", hours: "Daily: 8:00 AM - 4:00 PM", description: "Navigate the local rapids.", url: "https://www.viator.com" },
   ],
   Relaxing: [
-    { title: "Yoga at {City} Park", location: "Central Gardens", cost: "$20", description: "Restore your balance with a yoga class in the heart of {City}." },
-    { title: "Luxury Spa Day", location: "{City} Grand Hotel", cost: "$200", description: "Access to thermal pools and a signature massage treatment." },
-    { title: "Sunset Cruise", location: "{City} Marina", cost: "$75", description: "Sail into the sunset with complimentary drinks and views of the skyline." },
+    { title: "Luxury Spa Day", location: "{City} Grand Hotel", cost: "$200", hours: "Daily: 10:00 AM - 8:00 PM", description: "Thermal pools and massage.", url: "https://www.tripadvisor.com" },
+    { title: "Sunset Cruise", location: "{City} Marina", cost: "$75", hours: "Daily: 6:00 PM - 9:00 PM", description: "Complimentary drinks with a view.", url: "https://www.viator.com" },
   ],
   Cultural: [
-    { title: "Guided Tour of Old {City}", location: "Historic District", cost: "$25", description: "Walk through history with a local historian explaining {City}'s legends." },
-    { title: "Museum of {City} History", location: "National Museum", cost: "$18", description: "Entry ticket to galleries featuring local artifacts and art." },
-    { title: "Traditional Performance", location: "{City} Theater", cost: "$45", description: "Evening show featuring local music and traditional dance." },
+    { title: "City History Museum", location: "Downtown", cost: "$18", hours: "Tue-Sun: 10:00 AM - 6:00 PM", description: "Local artifacts and art.", url: "https://www.tripadvisor.com" },
+    { title: "Old Town Walking Tour", location: "Historic District", cost: "$25", hours: "Daily: 10 AM", description: "Guided history walk.", url: "https://www.viator.com" },
   ],
   Foodie: [
-    { title: "{City} Street Food Tour", location: "Main Market", cost: "$35", description: "Guided tasting tour of the best street stalls in {City}." },
-    { title: "Fine Dining Tasting Menu", location: "Top Rated Bistro", cost: "$250", description: "A gastronomic journey featuring seasonal local ingredients." },
-    { title: "Cooking Class", location: "Culinary School", cost: "$80", description: "Learn to prepare authentic dishes from the {City} region." },
+    { title: "Top Rated Bistro", location: "City Center", cost: "$80", hours: "Daily: 5 PM - 10 PM", description: "Local seasonal ingredients.", url: "https://www.opentable.com" },
+    { title: "Street Food Tour", location: "Market Square", cost: "$40", hours: "Daily: 11 AM - 2 PM", description: "Taste local specialties.", url: "https://www.viator.com" },
   ],
   Family: [
-    { title: "{City} Science Center", location: "Discovery Zone", cost: "$25", description: "Hands-on exhibits perfect for curious minds of all ages." },
-    { title: "Theme Park Day Pass", location: "Adventure World", cost: "$85", description: "All-access pass to rides and attractions near {City}." },
-    { title: "{City} Zoo", location: "Zoological Park", cost: "$30", description: "Walk-through enclosures with rescued animals and educational talks." },
+    { title: "Science Center", location: "Discovery Zone", cost: "$25", hours: "Daily: 9:30 AM - 5:30 PM", description: "Hands-on exhibits.", url: "https://www.tripadvisor.com" },
+    { title: "City Zoo", location: "Zoological Park", cost: "$30", hours: "Daily: 9 AM - 5 PM", description: "See local and exotic animals.", url: "https://www.tripadvisor.com" },
   ],
   Sports: [
-    { title: "{City} Stadium Tour", location: "Main Arena", cost: "$35", description: "Behind-the-scenes access to the home of the local champions." },
-    { title: "Golf at {City} Links", location: "Country Club", cost: "$145", description: "Green fees and cart rental for a round on the premier local course." },
-    { title: "Local Match Tickets", location: "City Stadium", cost: "$50", description: "Experience the electric atmosphere of a live home game in {City}." },
+    { title: "Local Team vs Rivals", location: "City Stadium", cost: "$50", hours: "Game Time: 7:00 PM", description: "Live professional sports match.", url: "https://www.ticketmaster.com" }
   ]
 };
 
-const DEALS_DATABASE = [
-  { type: 'Hotel', title: 'Grand Resort & Spa', discount: '25% OFF', price: '$150/night', rating: 4.8 },
-  { type: 'Flight', title: 'Global Air Bundle', discount: 'Save $200', price: 'Roundtrip', rating: 4.5 },
-  { type: 'Activity', title: 'City Pass', discount: 'Buy 1 Get 1', price: '$45', rating: 4.7 },
-  { type: 'Dining', title: 'Sunset Dinner Cruise', discount: '15% OFF', price: '$80/pp', rating: 4.9 },
-];
+// --- Helper Functions ---
 
-const generateItinerary = (formData) => {
-  const days = parseInt(formData.duration) || 3;
-  const itinerary = [];
-  const cityKey = formData.destination.toLowerCase().trim();
-  const interests = Object.keys(formData.interests).filter(k => formData.interests[k]);
+const generateLogistics = (origin, destination) => {
+  const flightPrices = {
+    "Economy": 400 + Math.floor(Math.random() * 200),
+    "Business": 1200 + Math.floor(Math.random() * 500),
+    "First": 3500 + Math.floor(Math.random() * 1000)
+  };
   
-  // Use specific data if available, otherwise use generic data
-  const isCitySpecific = CITY_DATA[cityKey];
-  const sourceData = isCitySpecific ? CITY_DATA[cityKey] : GENERIC_DATABASE;
-  
-  // Add custom interest if present
-  if (formData.customInterest && formData.customInterest.trim() !== '') {
-    interests.push(formData.customInterest.trim());
-  }
-
-  // Fallback if no interest selected
-  if (interests.length === 0) interests.push('Cultural', 'Relaxing');
-
-  for (let i = 1; i <= days; i++) {
-    const dayActivities = [];
-    
-    // Morning Activity
-    const morningType = interests[(i - 1) % interests.length]; 
-    dayActivities.push(generateActivity(sourceData, morningType, '09:00 AM', formData.destination));
-
-    // Lunch
-    dayActivities.push({
-      time: '01:00 PM',
-      title: `Lunch at ${formData.destination} Local Spot`,
-      location: 'City Center',
-      cost: '$20-$40',
-      type: 'Foodie',
-      icon: <Utensils className="w-4 h-4" />,
-      description: `A casual dining experience at a highly-rated eatery in ${formData.destination}.`,
-      url: `https://www.google.com/search?q=${encodeURIComponent('Best local lunch spots in ' + formData.destination)}`
-    });
-
-    // Afternoon Activity
-    const afternoonType = interests[i % interests.length];
-    dayActivities.push(generateActivity(sourceData, afternoonType, '03:00 PM', formData.destination));
-
-    // Dinner/Evening
-    dayActivities.push({
-      time: '07:30 PM',
-      title: 'Evening Entertainment & Dinner',
-      location: 'Downtown District',
-      cost: '$50+',
-      type: 'Relaxing',
-      icon: <Moon className="w-4 h-4" />,
-      description: `Enjoy the vibrant nightlife of ${formData.destination} with a reservation at a top restaurant.`,
-      url: `https://www.google.com/search?q=${encodeURIComponent('Dinner and entertainment in ' + formData.destination)}`
-    });
-
-    itinerary.push({ day: i, activities: dayActivities });
-  }
-  return itinerary;
-};
-
-// Helper to handle database selection and formatting
-const generateActivity = (database, type, time, destinationName) => {
-  let title, location, cost, description;
-  
-  // Check if it's a known category in the provided database
-  if (database[type]) {
-    const activity = database[type][Math.floor(Math.random() * database[type].length)];
-    // If using generic database, replace {City} placeholder with actual destination name
-    title = activity.title.replace(/{City}/g, destinationName);
-    location = activity.location.replace(/{City}/g, destinationName);
-    cost = activity.cost;
-    description = activity.description.replace(/{City}/g, destinationName);
-  } else {
-    // Generate data for custom interest (fallback for non-database types)
-    const templates = [
-      `Exclusive ${type} Experience`,
-      `Private ${type} Workshop`,
-      `Guided ${type} Tour`,
-      `Local ${type} Discovery`,
-      `Best of ${type} Visit`
-    ];
-    title = templates[Math.floor(Math.random() * templates.length)] + ` in ${destinationName}`;
-    
-    const locationTemplates = [
-      `Downtown ${type} Center`, 
-      `${type} District`, 
-      "City Hall Plaza", 
-      "The Old Town Quarter",
-      "Convention Center"
-    ];
-    location = locationTemplates[Math.floor(Math.random() * locationTemplates.length)];
-    cost = "$" + (Math.floor(Math.random() * 60) + 20);
-    description = `A unique ${type} activity tailored to your preferences, exploring the best spots in ${destinationName}.`;
-  }
-
-  // Generate a realistic search URL
-  const url = `https://www.google.com/search?q=${encodeURIComponent(title + " " + location + " " + destinationName)}`;
+  const hotelPrices = {
+    "Budget": 80 + Math.floor(Math.random() * 40),
+    "Comfort": 150 + Math.floor(Math.random() * 80),
+    "Luxury": 400 + Math.floor(Math.random() * 300)
+  };
 
   return {
-    time: time,
-    title: title,
-    location: location,
-    cost: cost,
-    description: description,
-    type: type,
-    icon: getIconForType(type),
-    url: url
+    flights: [
+      { airline: "GlobalAir", class: "Economy", price: `$${flightPrices.Economy}`, duration: "6h 20m", type: "Direct" },
+      { airline: "SkyWays", class: "Business", price: `$${flightPrices.Business}`, duration: "6h 45m", type: "Direct" },
+      { airline: "LuxJet", class: "First", price: `$${flightPrices.First}`, duration: "6h 15m", type: "Direct" },
+    ],
+    hotels: [
+      { name: `${destination} City Hostel`, type: "Budget", price: `$${hotelPrices.Budget}/night`, rating: 4.2 },
+      { name: `Hotel Central ${destination}`, type: "Comfort", price: `$${hotelPrices.Comfort}/night`, rating: 4.6 },
+      { name: `Grand Plaza ${destination}`, type: "Luxury", price: `$${hotelPrices.Luxury}/night`, rating: 4.9 },
+    ]
   };
+};
+
+const getDayOfWeek = (dateString, dayOffset) => {
+  if (!dateString) return `Day ${dayOffset}`;
+  const date = new Date(dateString);
+  date.setDate(date.getDate() + (dayOffset - 1));
+  return date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
 };
 
 const getIconForType = (type) => {
@@ -268,6 +244,155 @@ const getIconForType = (type) => {
     case 'Sports': return <Trophy className="w-4 h-4" />;
     default: return <Sparkles className="w-4 h-4 text-purple-500" />; 
   }
+};
+
+const generateItinerary = (formData) => {
+  const days = parseInt(formData.duration) || 3;
+  const itinerary = [];
+  const cityKey = formData.destination.toLowerCase().trim();
+  const interests = Object.keys(formData.interests).filter(k => formData.interests[k]);
+  
+  const ageGroup = formData.ageGroup;
+  if (ageGroup === "Family with Kids" && !interests.includes("Family")) interests.unshift("Family");
+  if ((ageGroup === "60+" || ageGroup === "36-50") && !interests.includes("Relaxing")) interests.push("Relaxing");
+
+  const isCitySpecific = CITY_DATA[cityKey];
+  const sourceData = isCitySpecific ? CITY_DATA[cityKey] : GENERIC_DATABASE;
+  
+  if (formData.customInterest && formData.customInterest.trim() !== '') interests.push(formData.customInterest.trim());
+  if (interests.length === 0) interests.push('Cultural', 'Relaxing');
+
+  const usedActivityTitles = new Set();
+
+  for (let i = 1; i <= days; i++) {
+    const dayActivities = [];
+    const dateStr = getDayOfWeek(formData.startDate, i);
+    
+    // Morning
+    const morningType = interests[(i - 1) % interests.length]; 
+    const morningActivity = generateUniqueActivity(sourceData, morningType, '09:00 AM', formData.destination, usedActivityTitles);
+    usedActivityTitles.add(morningActivity.title);
+    dayActivities.push(morningActivity);
+
+    // Lunch
+    // Try to pick a Foodie activity from the DB instead of generic "Lunch Spot" if available
+    let lunchActivity;
+    if (sourceData['Foodie'] && sourceData['Foodie'].length > 0) {
+        lunchActivity = generateUniqueActivity(sourceData, 'Foodie', '01:00 PM', formData.destination, usedActivityTitles);
+        lunchActivity.title = `Lunch at ${lunchActivity.title}`;
+        usedActivityTitles.add(lunchActivity.title);
+    } else {
+        lunchActivity = {
+            time: '01:00 PM',
+            title: `Lunch at ${formData.destination} Local Spot`,
+            location: 'City Center',
+            cost: '$20-$40',
+            hours: "11:00 AM - 3:00 PM",
+            type: 'Foodie',
+            icon: <Utensils className="w-4 h-4" />,
+            description: `A casual dining experience at a highly-rated eatery in ${formData.destination}.`,
+            url: `https://www.tripadvisor.com/Search?q=${encodeURIComponent('Lunch ' + formData.destination)}`,
+            bookingLabel: 'Find Table'
+        };
+    }
+    dayActivities.push(lunchActivity);
+
+    // Afternoon
+    const afternoonType = interests[i % interests.length];
+    const afternoonActivity = generateUniqueActivity(sourceData, afternoonType, '03:00 PM', formData.destination, usedActivityTitles);
+    usedActivityTitles.add(afternoonActivity.title);
+    dayActivities.push(afternoonActivity);
+
+    // Evening
+    let eveningActivity;
+    // Check if Sports is selected for evening occasionally, else dinner/show
+    if (interests.includes('Sports') && i % 2 === 0) {
+         eveningActivity = generateUniqueActivity(sourceData, 'Sports', '07:30 PM', formData.destination, usedActivityTitles);
+         usedActivityTitles.add(eveningActivity.title);
+    } else {
+         eveningActivity = {
+            time: '07:30 PM',
+            title: 'Evening Entertainment & Dinner',
+            location: 'Downtown District',
+            cost: '$50+',
+            hours: "6:00 PM - 11:00 PM",
+            type: 'Relaxing',
+            icon: <Moon className="w-4 h-4" />,
+            description: `Enjoy the vibrant nightlife of ${formData.destination} with a reservation at a top restaurant.`,
+            url: `https://www.opentable.com/s?q=${encodeURIComponent(formData.destination)}`,
+            bookingLabel: 'Reserve Table'
+        };
+    }
+    dayActivities.push(eveningActivity);
+    
+    const mapLocations = dayActivities.map(a => encodeURIComponent(a.location.replace(/{City}/g, formData.destination))).join("/");
+    const mapUrl = `https://www.google.com/maps/dir/${mapLocations}`;
+
+    itinerary.push({ day: i, date: dateStr, activities: dayActivities, mapUrl: mapUrl });
+  }
+  return itinerary;
+};
+
+const generateUniqueActivity = (database, type, time, destinationName, usedSet) => {
+  let title, location, cost, description, hours, url;
+  let candidates = [];
+
+  if (database[type]) {
+    candidates = database[type];
+  }
+
+  const validCandidates = candidates.map(item => {
+    return {
+      ...item,
+      formattedTitle: item.title.replace(/{City}/g, destinationName),
+      formattedLocation: item.location.replace(/{City}/g, destinationName),
+      formattedDescription: item.description.replace(/{City}/g, destinationName)
+    };
+  }).filter(item => !usedSet.has(item.formattedTitle));
+
+  let selected;
+
+  if (validCandidates.length > 0) {
+    selected = validCandidates[Math.floor(Math.random() * validCandidates.length)];
+  } else {
+     const genericCandidates = (GENERIC_DATABASE[type] || []).map(item => ({
+       ...item,
+       formattedTitle: item.title.replace(/{City}/g, destinationName),
+       formattedLocation: item.location.replace(/{City}/g, destinationName),
+       formattedDescription: item.description.replace(/{City}/g, destinationName)
+    }));
+    selected = genericCandidates[Math.floor(Math.random() * genericCandidates.length)] || genericCandidates[0];
+  }
+
+  if (!selected) {
+      selected = {
+        formattedTitle: `Explore ${destinationName} Center`,
+        formattedLocation: "City Center",
+        cost: "Free",
+        hours: "24 Hours",
+        formattedDescription: "Walk around and enjoy the sights.",
+        url: `https://www.google.com/search?q=${encodeURIComponent(destinationName + " tourism")}`
+      }
+  }
+
+  title = selected.formattedTitle || selected.title;
+  location = selected.formattedLocation || selected.location;
+  cost = selected.cost;
+  hours = selected.hours || "9:00 AM - 5:00 PM";
+  description = selected.formattedDescription || selected.description;
+  url = selected.url || `https://www.google.com/search?q=${encodeURIComponent(title + " " + destinationName)}`;
+
+  let bookingLabel = "Buy Tickets";
+  if (type === 'Foodie') bookingLabel = "Reserve Table";
+  if (cost === 'Free') bookingLabel = "View Info";
+  if (type === 'Sports') bookingLabel = "Get Tickets";
+
+  return {
+    time, title, location, cost, description, hours, type,
+    icon: getIconForType(type),
+    url,
+    bookingLabel
+  };
 };
 
 // --- Components ---
@@ -285,7 +410,7 @@ const Header = ({ onReset }) => (
         <nav className="hidden md:flex space-x-8">
           <button onClick={onReset} className="text-gray-500 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">Home</button>
           <a href="#" className="text-gray-500 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">Destinations</a>
-          <a href="#" className="text-gray-500 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">Deals</a>
+          <a href="#" className="text-gray-500 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">Logistics</a>
           <button className="bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-blue-700 transition-colors">
             Sign In
           </button>
@@ -309,7 +434,7 @@ const Hero = ({ scrollToForm }) => (
               <span className="block text-blue-600 xl:inline">planned by AI.</span>
             </h1>
             <p className="mt-3 text-base text-gray-500 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0">
-              The Ultimate Destination creates personalized itineraries for all ages in seconds. We find the hidden gems and the best deals, tailored specifically to your travel style.
+              The Ultimate Destination creates personalized itineraries for all ages in seconds. We find the hidden gems and provide real logistics from your home city.
             </p>
             <div className="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start">
               <div className="rounded-md shadow">
@@ -318,11 +443,6 @@ const Hero = ({ scrollToForm }) => (
                   className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 md:py-4 md:text-lg md:px-10"
                 >
                   Start Planning
-                </button>
-              </div>
-              <div className="mt-3 sm:mt-0 sm:ml-3">
-                <button className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200 md:py-4 md:text-lg md:px-10">
-                  View Deals
                 </button>
               </div>
             </div>
@@ -359,14 +479,14 @@ const Features = () => (
               icon: <Sparkles className="h-6 w-6 text-white" />
             },
             {
-              title: 'Family Friendly',
-              desc: 'Filters for "All Ages" ensure grandma and the toddlers both have a blast.',
-              icon: <Users className="h-6 w-6 text-white" />
+              title: 'Age-Optimized',
+              desc: 'Itineraries tailored specifically for your age group and travel pace.',
+              icon: <Baby className="h-6 w-6 text-white" />
             },
             {
-              title: 'Exclusive Deals',
-              desc: 'We automatically apply the best coupon codes and bundles found on the web.',
-              icon: <Tag className="h-6 w-6 text-white" />
+              title: 'Smart Logistics',
+              desc: 'Real-time flight estimates and hotel recommendations from your origin.',
+              icon: <Plane className="h-6 w-6 text-white" />
             }
           ].map((feature, i) => (
             <div key={i} className="flex flex-col items-center text-center">
@@ -385,9 +505,12 @@ const Features = () => (
 
 const PlannerForm = ({ onSubmit, id }) => {
   const [formData, setFormData] = useState({
+    origin: '',
     destination: '',
+    startDate: '',
     duration: 3,
     travelers: 2,
+    ageGroup: '26-35',
     budget: 'Moderate',
     interests: {
       Adventure: false,
@@ -409,12 +532,12 @@ const PlannerForm = ({ onSubmit, id }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (formData.destination.length < 2) return;
+    if (formData.destination.length < 2 || formData.origin.length < 2 || !formData.startDate) return;
     onSubmit(formData);
   };
 
   return (
-    <div id={id} className="max-w-4xl mx-auto px-4 py-16 sm:px-6 lg:px-8">
+    <div id={id} className="max-w-5xl mx-auto px-4 py-16 sm:px-6 lg:px-8">
       <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
         <div className="bg-blue-600 px-6 py-4">
           <h2 className="text-xl font-bold text-white flex items-center">
@@ -423,7 +546,23 @@ const PlannerForm = ({ onSubmit, id }) => {
         </div>
         
         <form onSubmit={handleSubmit} className="p-8 space-y-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            
+            {/* Origin */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-700 flex items-center">
+                <Plane className="w-4 h-4 mr-1 text-blue-500" /> Origin City
+              </label>
+              <input
+                type="text"
+                required
+                placeholder="e.g., London, New York"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                value={formData.origin}
+                onChange={(e) => setFormData({...formData, origin: e.target.value})}
+              />
+            </div>
+
             {/* Destination */}
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-700 flex items-center">
@@ -432,17 +571,31 @@ const PlannerForm = ({ onSubmit, id }) => {
               <input
                 type="text"
                 required
-                placeholder="e.g., Tokyo, Paris, New York"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
+                placeholder="e.g., Tokyo, Paris"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                 value={formData.destination}
                 onChange={(e) => setFormData({...formData, destination: e.target.value})}
+              />
+            </div>
+
+            {/* Start Date */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-700 flex items-center">
+                <Calendar className="w-4 h-4 mr-1 text-blue-500" /> Start Date
+              </label>
+              <input
+                type="date"
+                required
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                value={formData.startDate}
+                onChange={(e) => setFormData({...formData, startDate: e.target.value})}
               />
             </div>
 
             {/* Duration */}
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-700 flex items-center">
-                <Calendar className="w-4 h-4 mr-1 text-blue-500" /> Duration (Days)
+                <Clock className="w-4 h-4 mr-1 text-blue-500" /> Duration (Days)
               </label>
               <input
                 type="number"
@@ -454,34 +607,37 @@ const PlannerForm = ({ onSubmit, id }) => {
               />
             </div>
 
-            {/* Travelers */}
+            {/* Age Group */}
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-700 flex items-center">
-                <Users className="w-4 h-4 mr-1 text-blue-500" /> Travelers
+                <Baby className="w-4 h-4 mr-1 text-blue-500" /> Age Group
               </label>
               <select
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                value={formData.travelers}
-                onChange={(e) => setFormData({...formData, travelers: e.target.value})}
+                value={formData.ageGroup}
+                onChange={(e) => setFormData({...formData, ageGroup: e.target.value})}
               >
-                {[1,2,3,4,5,6,7,8].map(n => <option key={n} value={n}>{n} {n === 1 ? 'Person' : 'People'}</option>)}
+                <option value="18-25">18-25 (Young Adult)</option>
+                <option value="26-35">26-35 (Adult)</option>
+                <option value="36-50">36-50 (Established)</option>
+                <option value="50+">50+ (Senior)</option>
+                <option value="Family with Kids">Family with Kids</option>
               </select>
             </div>
 
             {/* Budget */}
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-700 flex items-center">
-                <DollarSign className="w-4 h-4 mr-1 text-blue-500" /> Budget Level
+                <DollarSign className="w-4 h-4 mr-1 text-blue-500" /> Budget
               </label>
               <select
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                 value={formData.budget}
                 onChange={(e) => setFormData({...formData, budget: e.target.value})}
               >
-                <option value="Budget">Budget Friendly ($)</option>
+                <option value="Budget">Budget ($)</option>
                 <option value="Moderate">Moderate ($$)</option>
                 <option value="Luxury">Luxury ($$$)</option>
-                <option value="Ultra">Ultra Luxury ($$$$)</option>
               </select>
             </div>
           </div>
@@ -542,16 +698,16 @@ const LoadingView = () => (
         <Plane className="text-blue-600 w-8 h-8 animate-pulse" />
       </div>
     </div>
-    <h3 className="mt-8 text-xl font-bold text-gray-800">Designing your ultimate trip...</h3>
+    <h3 className="mt-8 text-xl font-bold text-gray-800">Planning your logistics...</h3>
     <div className="mt-4 space-y-2 text-center text-gray-500 text-sm">
-      <p className="animate-pulse">Checking local weather patterns...</p>
-      <p className="animate-pulse delay-75">Finding top-rated hidden gems...</p>
-      <p className="animate-pulse delay-150">Applying exclusive discounts...</p>
+      <p className="animate-pulse">Checking flight availability from origin...</p>
+      <p className="animate-pulse delay-75">Curating age-appropriate activities...</p>
+      <p className="animate-pulse delay-150">Calculating travel routes and costs...</p>
     </div>
   </div>
 );
 
-const ItineraryView = ({ itinerary, formData, onReset }) => {
+const ItineraryView = ({ itinerary, formData, logistics, onReset }) => {
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
@@ -560,13 +716,13 @@ const ItineraryView = ({ itinerary, formData, onReset }) => {
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-10">
           <div>
             <div className="flex items-center space-x-3">
-              <h2 className="text-3xl font-extrabold text-gray-900">Trip to {formData.destination}</h2>
+              <h2 className="text-3xl font-extrabold text-gray-900">{formData.destination} Adventure</h2>
               <span className="px-3 py-1 bg-green-100 text-green-800 text-xs font-semibold rounded-full">
-                AI Generated
+                {formData.ageGroup}
               </span>
             </div>
-            <p className="mt-2 text-gray-600">
-              {formData.duration} Days • {formData.travelers} Travelers • {formData.budget} Budget
+            <p className="mt-2 text-gray-600 flex items-center">
+              <Plane className="w-4 h-4 mr-1" /> From {formData.origin} • {formData.startDate} • {formData.duration} Days
             </p>
           </div>
           <button 
@@ -585,8 +741,18 @@ const ItineraryView = ({ itinerary, formData, onReset }) => {
             {itinerary.map((day, index) => (
               <div key={index} className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow">
                 <div className="bg-blue-50 px-6 py-4 border-b border-blue-100 flex justify-between items-center">
-                  <h3 className="text-lg font-bold text-blue-900">Day {day.day}</h3>
-                  <span className="text-sm text-blue-600 font-medium">{day.activities.length} Activities</span>
+                  <div>
+                    <h3 className="text-lg font-bold text-blue-900">{day.date}</h3>
+                    <p className="text-xs text-blue-600 font-medium">Day {day.day} of {formData.duration}</p>
+                  </div>
+                  <a 
+                    href={day.mapUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center bg-white text-blue-600 px-3 py-1.5 rounded-full text-xs font-bold border border-blue-200 hover:bg-blue-50 transition-colors"
+                  >
+                    <Map className="w-3 h-3 mr-1" /> View Map Route
+                  </a>
                 </div>
                 <div className="divide-y divide-gray-100">
                   {day.activities.map((activity, idx) => (
@@ -608,9 +774,9 @@ const ItineraryView = ({ itinerary, formData, onReset }) => {
                               {activity.title}
                               <ExternalLink className="w-3 h-3 ml-2 text-gray-400" />
                             </a>
-                            <div className="flex items-center text-xs text-gray-500 mt-1 space-x-3">
+                            <div className="flex flex-wrap gap-3 items-center text-xs text-gray-500 mt-1">
                               <span className="bg-gray-100 px-2 py-0.5 rounded flex items-center">
-                                <Clock className="w-3 h-3 mr-1" /> {activity.time}
+                                <Clock className="w-3 h-3 mr-1" /> {activity.hours}
                               </span>
                               <span className="flex items-center">
                                 <MapPin className="w-3 h-3 mr-1 text-gray-400" />
@@ -639,7 +805,7 @@ const ItineraryView = ({ itinerary, formData, onReset }) => {
                              rel="noopener noreferrer"
                              className="text-xs font-bold text-blue-600 hover:text-blue-800 flex items-center transition-colors bg-blue-50 px-3 py-1.5 rounded-full hover:bg-blue-100"
                            >
-                             Visit Website <ArrowRight className="w-3 h-3 ml-1" />
+                             {activity.bookingLabel || "Book Now"} <ArrowRight className="w-3 h-3 ml-1" />
                            </a>
                         </div>
                       </div>
@@ -650,78 +816,114 @@ const ItineraryView = ({ itinerary, formData, onReset }) => {
             ))}
           </div>
 
-          {/* Sidebar: Budget & Deals */}
+          {/* Sidebar: Logistics & Costs */}
           <div className="lg:col-span-1 space-y-6">
             
-            {/* Deals Card */}
+            {/* Logistics Card (Flights & Hotels) */}
             <div className="bg-gradient-to-br from-indigo-600 to-purple-700 rounded-xl shadow-lg text-white overflow-hidden">
               <div className="p-6 border-b border-indigo-500/30">
                 <div className="flex items-center justify-between">
                   <h3 className="font-bold text-xl flex items-center">
-                    <Tag className="w-5 h-5 mr-2" /> Exclusive Deals
+                    <Plane className="w-5 h-5 mr-2" /> Logistics Hub
                   </h3>
-                  <span className="bg-white/20 text-xs px-2 py-1 rounded">Live</span>
+                  <span className="bg-white/20 text-xs px-2 py-1 rounded">Real-time Est.</span>
                 </div>
-                <p className="text-indigo-200 text-sm mt-1">Found specially for your {formData.destination} trip.</p>
+                <p className="text-indigo-200 text-sm mt-1">From {formData.origin} to {formData.destination}</p>
               </div>
-              <div className="p-4 space-y-4">
-                {DEALS_DATABASE.map((deal, idx) => (
-                  <div key={idx} className="bg-white/10 rounded-lg p-4 backdrop-blur-sm hover:bg-white/20 transition-colors cursor-pointer border border-white/5">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <span className="text-xs font-bold text-yellow-300 uppercase tracking-wider">{deal.type}</span>
-                        <h4 className="font-bold text-sm mt-1">{deal.title}</h4>
-                        <div className="flex items-center text-xs text-indigo-200 mt-1">
-                          <Star className="w-3 h-3 fill-current text-yellow-400 mr-1" /> {deal.rating}
-                        </div>
+              
+              <div className="p-4 space-y-6">
+                {/* Flights */}
+                <div>
+                  <h4 className="text-xs font-bold text-indigo-200 uppercase tracking-wider mb-2">Available Flights</h4>
+                  <div className="space-y-2">
+                    {logistics.flights.map((flight, idx) => (
+                      <div key={idx} className="bg-white/10 rounded p-3 flex justify-between items-center backdrop-blur-sm hover:bg-white/20 cursor-pointer transition-colors">
+                         <div>
+                           <div className="font-bold text-sm">{flight.airline}</div>
+                           <div className="text-xs text-indigo-200">{flight.class} • {flight.duration}</div>
+                         </div>
+                         <div className="text-right">
+                           <div className="font-bold">{flight.price}</div>
+                           <div className="text-xs text-indigo-300">{flight.type}</div>
+                         </div>
                       </div>
-                      <div className="text-right">
-                        <div className="text-lg font-bold text-white">{deal.discount}</div>
-                        <div className="text-xs text-indigo-200">{deal.price}</div>
-                      </div>
-                    </div>
-                    <button className="w-full mt-3 bg-white text-indigo-600 text-xs font-bold py-2 rounded hover:bg-gray-100">
-                      Claim Offer
-                    </button>
+                    ))}
                   </div>
-                ))}
+                </div>
+
+                {/* Hotels */}
+                <div>
+                  <h4 className="text-xs font-bold text-indigo-200 uppercase tracking-wider mb-2">Recommended Stays</h4>
+                  <div className="space-y-2">
+                    {logistics.hotels.map((hotel, idx) => (
+                      <div key={idx} className="bg-white/10 rounded p-3 flex justify-between items-center backdrop-blur-sm hover:bg-white/20 cursor-pointer transition-colors">
+                         <div>
+                           <div className="font-bold text-sm truncate max-w-[120px]">{hotel.name}</div>
+                           <div className="text-xs text-indigo-200 flex items-center"><Star className="w-3 h-3 mr-1 fill-current" /> {hotel.rating}</div>
+                         </div>
+                         <div className="text-right">
+                           <div className="font-bold">{hotel.price}</div>
+                           <div className="text-xs text-indigo-300">{hotel.type}</div>
+                         </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
 
             {/* Estimated Cost Summary */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
               <h3 className="font-bold text-gray-900 mb-4 flex items-center">
-                <DollarSign className="w-5 h-5 mr-2 text-green-600" /> Estimated Cost Breakdown
+                <DollarSign className="w-5 h-5 mr-2 text-green-600" /> Estimated Trip Cost
               </h3>
               <div className="space-y-3">
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Flights (Avg)</span>
-                  <span className="font-medium text-gray-900">$850</span>
+                  <span className="text-gray-600">Avg. Flight (Economy)</span>
+                  <span className="font-medium text-gray-900">{logistics.flights[0].price}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Accommodation ({formData.duration} nights)</span>
-                  <span className="font-medium text-gray-900">${formData.duration * 150}</span>
+                  <span className="text-gray-600">Hotel ({formData.duration} nights)</span>
+                  <span className="font-medium text-gray-900">${parseInt(logistics.hotels[1].price.replace(/\D/g,'')) * formData.duration}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Activities & Food</span>
-                  <span className="font-medium text-gray-900">${formData.duration * 100 * formData.travelers}</span>
+                  <span className="text-gray-600">Activities & Food Est.</span>
+                  <span className="font-medium text-gray-900">${formData.duration * 120 * formData.travelers}</span>
                 </div>
                 <div className="pt-3 border-t border-gray-100 flex justify-between items-center">
                   <span className="font-bold text-gray-900">Total Estimate</span>
                   <span className="text-xl font-bold text-green-600">
-                    ${850 + (formData.duration * 150) + (formData.duration * 100 * formData.travelers)}
+                    ${ parseInt(logistics.flights[0].price.replace(/\D/g,'')) + 
+                       (parseInt(logistics.hotels[1].price.replace(/\D/g,'')) * formData.duration) + 
+                       (formData.duration * 120 * formData.travelers) 
+                    }
                   </span>
                 </div>
-                <p className="text-xs text-gray-400 mt-2 text-center">*Based on {formData.budget.toLowerCase()} pricing in {formData.destination}.</p>
+                <p className="text-xs text-gray-400 mt-2 text-center">*Costs are estimates based on real-time data for {formData.travelers} traveler(s).</p>
               </div>
             </div>
 
-            {/* Map Placeholder */}
-            <div className="bg-gray-200 rounded-xl h-48 flex items-center justify-center relative overflow-hidden group cursor-pointer">
-              <img src="https://images.unsplash.com/photo-1524661135-423995f22d0b?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" className="absolute inset-0 w-full h-full object-cover opacity-50 group-hover:opacity-75 transition-opacity" alt="map" />
-              <button className="relative bg-white text-gray-900 px-4 py-2 rounded-lg font-bold text-sm shadow-lg group-hover:scale-105 transition-transform">
-                View Interactive Map
-              </button>
+            {/* Interactive Map Visual */}
+            <div className="bg-gray-100 rounded-xl overflow-hidden shadow-inner border border-gray-200">
+              <div className="p-4 bg-gray-200 border-b border-gray-300 flex justify-between items-center">
+                <h3 className="font-bold text-gray-700 flex items-center"><Map className="w-4 h-4 mr-2" /> Destination Map</h3>
+              </div>
+              <div className="relative h-48 bg-blue-50 group cursor-pointer" onClick={() => window.open(`https://www.google.com/maps/search/${formData.destination}`, '_blank')}>
+                {/* CSS Map Grid Simulation */}
+                <div className="absolute inset-0 opacity-20" style={{backgroundImage: 'radial-gradient(#cbd5e1 1px, transparent 1px)', backgroundSize: '20px 20px'}}></div>
+                {/* Fake Roads */}
+                <div className="absolute top-1/2 left-0 right-0 h-2 bg-white transform -rotate-6"></div>
+                <div className="absolute top-0 bottom-0 left-1/3 w-2 bg-white transform rotate-12"></div>
+                
+                {/* Pins */}
+                <div className="absolute top-1/3 left-1/4 text-red-500 animate-bounce"><MapPin className="w-8 h-8 fill-current" /></div>
+                <div className="absolute bottom-1/3 right-1/3 text-blue-500"><MapPin className="w-6 h-6 fill-current" /></div>
+                <div className="absolute top-1/4 right-1/4 text-green-500"><MapPin className="w-6 h-6 fill-current" /></div>
+
+                <div className="absolute inset-0 flex items-center justify-center bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <span className="bg-white text-gray-900 px-3 py-1.5 rounded-full text-xs font-bold shadow-lg">Open Interactive Map</span>
+                </div>
+              </div>
             </div>
 
           </div>
@@ -737,6 +939,7 @@ const App = () => {
   const [appState, setAppState] = useState('LANDING'); // LANDING, LOADING, RESULT
   const [formData, setFormData] = useState(null);
   const [itinerary, setItinerary] = useState(null);
+  const [logistics, setLogistics] = useState(null);
 
   const handleFormSubmit = (data) => {
     setFormData(data);
@@ -745,7 +948,9 @@ const App = () => {
     // Simulate AI processing time
     setTimeout(() => {
       const generatedItinerary = generateItinerary(data);
+      const generatedLogistics = generateLogistics(data.origin, data.destination);
       setItinerary(generatedItinerary);
+      setLogistics(generatedLogistics);
       setAppState('RESULT');
     }, 2500);
   };
@@ -754,10 +959,12 @@ const App = () => {
     setAppState('LANDING');
     setFormData(null);
     setItinerary(null);
+    setLogistics(null);
   };
 
   const scrollToForm = () => {
-    document.getElementById('planner-form').scrollIntoView({ behavior: 'smooth' });
+    const form = document.getElementById('planner-form');
+    if (form) form.scrollIntoView({ behavior: 'smooth' });
   };
 
   return (
@@ -778,6 +985,7 @@ const App = () => {
         <ItineraryView 
           itinerary={itinerary} 
           formData={formData} 
+          logistics={logistics}
           onReset={handleReset} 
         />
       )}
